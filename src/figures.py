@@ -24,6 +24,7 @@ text{font-family:system-ui,'Segoe UI',Roboto,Arial,sans-serif;font-size:13px;fil
 .ind{font-size:.72em;font-style:normal}
 .vr{stroke:#B42318;fill:#B42318}.vb{stroke:#1F5FA8;fill:#1F5FA8}.vk{stroke:#1C2530;fill:#1C2530}.vv{stroke:#1B7A43;fill:#1B7A43}
 .vr,.vb,.vk,.vv{stroke-width:2.2;stroke-linecap:round}
+.vrl{stroke:#B42318;fill:none;stroke-width:2.2}.vbl{stroke:#1F5FA8;fill:none;stroke-width:2.2}
 .cote{stroke:#5A6670;stroke-width:.9;fill:#5A6670}
 .pointille{fill:none;stroke:#5A6670;stroke-width:1;stroke-dasharray:4 3}
 </style>"""
@@ -154,21 +155,20 @@ def skieur(x, y, ang=0, s=1.0):
 
 # ============================================================ accueil et cartes
 def tremplin(lab=True):
-    pente = [(455, 40), (300, 190), (250, 222), (150, 222)]
     s = sol((60, 240), (470, 240))
-    s += PL([(470, 30), (455, 40), (300, 190), (250, 222), (150, 222), (150, 232), (252, 232), (305, 198), (470, 45)],
+    s += PL([(462, 68), (448, 76), (300, 190), (250, 222), (150, 222), (150, 232), (252, 232), (305, 198), (462, 82)],
             "mo", True)
     for x in (200, 300, 380, 440):
-        y0 = 232 if x < 252 else (198 - (x - 305) * 0.9 if x > 305 else 215)
+        y0 = 232 if x < 252 else (198 - (x - 305) * 0.74 if x > 305 else 215)
         s += L((x, y0), (x, 240), "m")
-    s += skieur(445, 38, -44, 0.9) + skieur(205, 220, 0, 0.9)
+    s += skieur(438, 80, -38, 0.85) + skieur(205, 220, 0, 0.9)
     s += F((180, 196), (110, 196), "vr", 11) + V((112, 186), "v", "", "tr")
     s += PL([(70, 150), (100, 178), (150, 196)], "pointille")
     if lab:
-        s += L((445, 38), (130, 38), "pointille") + L((150, 222), (130, 222), "pointille")
-        s += F((130, 120), (130, 40), "cote", 8) + F((130, 140), (130, 220), "cote", 8) + T((136, 134), "h", "tn")
-        s += T((290, 70), "Énergie potentielle", "tb") + T((290, 88), "m·g·h", "tc")
-        s += F((330, 96), (250, 150), "vb", 10) + T((40, 125), "Énergie cinétique", "tr") + T((40, 143), "½·m·v²", "tc")
+        s += L((448, 76), (478, 76), "pointille") + L((470, 222), (478, 222), "pointille") + L((250, 222), (470, 222), "pointille")
+        s += F((472, 140), (472, 78), "cote", 8) + F((472, 160), (472, 220), "cote", 8) + T((458, 154), "h", "tn")
+        s += T((300, 100), "Énergie potentielle", "tb", "end") + T((300, 116), "m·g·h", "tc", "end")
+        s += F((310, 120), (250, 168), "vb", 10) + T((40, 125), "Énergie cinétique", "tr") + T((40, 143), "½·m·v²", "tc")
     return s
 
 
@@ -199,10 +199,7 @@ def bielle_manivelle(o=(110, 170), r=55, ang=55, Lb=200, vec=True):
     if vec:
         # vitesse de A perpendiculaire à OA, vitesse de B horizontale (équiprojectivité le long de AB)
         k = 1.25
-        va = (math.sin(a) * -1, -math.cos(a))
-        va = (-math.sin(a), -math.cos(a))
-        VA = (A[0] - va[0] * 0 + math.sin(a) * 0, A[1])
-        tA = (A[0] - math.sin(a) * 60 * k * -1, A[1] - math.cos(a) * 60 * k)
+        tA = (A[0] + math.sin(a) * 60 * k, A[1] - math.cos(a) * 60 * k)
         s += F(A, tA, "vb", 10)
         d = ((B[0] - A[0]) / Lb, (B[1] - A[1]) / Lb)
         proj = (tA[0] - A[0]) * d[0] + (tA[1] - A[1]) * d[1]
@@ -262,7 +259,7 @@ def carte_etude():
 # ============================================================ figures des activités
 def fig_qcm1():
     s = C((130, 140), 60, "mb") + C((130, 140), 8, "art") + L((130, 140), (190, 140), "fin")
-    s += '<path class="vr" fill="none" d="M80 95 A68 68 0 0 1 182 100"/>' + F((176, 92), (184, 102), "vr", 10)
+    s += '<path class="vrl" d="M80 95 A68 68 0 0 1 182 100"/>' + F((176, 92), (184, 102), "vr", 10)
     s += T((125, 60), "C", "tn tr") + T((198, 150), "θ", "tn")
     s += sol((260, 210), (460, 210)) + R(300, 160, 90, 50, "mo", 3) + F((345, 140), (440, 140), "vb", 11)
     s += V((400, 128), "V", "", "tb") + T((320, 192), "m", "tn")
@@ -275,7 +272,7 @@ def fig_qcm2():
     s += F((140, 156), (232, 128), "vb", 11) + F((140, 156), (190, 60), "vr", 11)
     s += V((236, 126), "V", "", "tb") + V((194, 60), "F", "", "tr") + T((166, 128), "θ", "tn")
     s += C((360, 140), 50, "mb") + C((360, 140), 7, "art")
-    s += '<path class="vr" fill="none" d="M318 104 A58 58 0 0 1 404 106"/>' + F((398, 98), (406, 108), "vr", 10)
+    s += '<path class="vrl" d="M318 104 A58 58 0 0 1 404 106"/>' + F((398, 98), (406, 108), "vr", 10)
     s += T((356, 70), "C", "tn tr") + T((420, 150), "ω", "tn")
     s += T((140, 250), "puissance d'une force", "tc", "middle") + T((360, 250), "puissance d'un couple", "tc", "middle")
     return s
@@ -287,8 +284,8 @@ def fig_ascenseur():
     s += R(150, 90, 180, 150, "mb", 2) + L((240, 20), (240, 90), "m") + T((246, 50), "câble", "tc")
     s += personnage(285, 232) + T((168, 228), "cabine", "tc")
     s += F((200, 200), (200, 120), "vr", 11) + V((208, 132), "V", "", "tr") + T((208, 150), "1,2 m/s", "tc")
-    s += T((372, 120), "m = 850 kg", "tn") + T((372, 140), "frottements", "tc") + T((372, 156), "40 daN", "tc")
-    s += cote((420, 246), (420, 30), "25 m", 0).replace("tc", "tc")
+    s += T((360, 120), "m = 850 kg", "tn") + T((360, 140), "frottements", "tc") + T((360, 156), "40 daN", "tc")
+    s += cote((462, 246), (462, 30), "25 m", 0)
     return s
 
 
@@ -405,7 +402,7 @@ def fig_verin(balancier=False):
 
 def fig_frein_sabot(deux=False):
     s = C((250, 170), 70, "mb") + C((250, 170), 28, "mf") + pivot((250, 170), 6)
-    s += '<path class="vb" fill="none" d="M170 150 A82 82 0 0 1 200 100"/>' + F((196, 106), (202, 98), "vb", 9)
+    s += '<path class="vbl" d="M170 150 A82 82 0 0 1 200 100"/>' + F((196, 106), (202, 98), "vb", 9)
     s += T((168, 120), "ω", "tn tb")
     if not deux:
         s += pivot((60, 84), 6) + PL([(60, 84), (110, 74), (430, 74)], "m")
@@ -450,7 +447,7 @@ def engrenage(c, r, z, cls="mb"):
 def fig_roues():
     s = engrenage((150, 140), 50, 12, "mf") + engrenage((280, 140), 125 * 0.66, 30, "mo")
     s += T((140, 70), "roue A", "tc") + T((300, 40), "roue B", "tc")
-    s += '<path class="vr" fill="none" d="M110 92 A62 62 0 0 1 170 78"/>' + F((164, 76), (174, 80), "vr", 9)
+    s += '<path class="vrl" d="M110 92 A62 62 0 0 1 170 78"/>' + F((164, 76), (174, 80), "vr", 9)
     s += V((104, 84), "C", "A", "tr") + L((150, 140), (150, 190), "fin") + T((156, 172), "rA", "tc")
     s += L((280, 140), (360, 140), "fin") + T((320, 132), "rB", "tc")
     return s
@@ -459,9 +456,10 @@ def fig_roues():
 def fig_balancier():
     s = fig_verin(True)
     s += L((240, 180), (240, 200)) + C((240, 204), 5, "art")
-    s += R(120, 196, 320, 18, "mf") + pivot((128, 214), 5) + T((112, 210), "A", "tn", "end")
-    s += T((246, 230), "B", "tn") + F((360, 214), (360, 262), "vk", 9) + V((368, 254), "P", "", "")
-    s += T((380, 254), "5 000 daN", "tc") + F((300, 150), (300, 190), "vr", 9) + T((306, 168), "0,3 m/s", "tc")
+    s += R(162, 196, 296, 18, "mf") + pivot((170, 214), 5) + T((156, 210), "A", "tn", "end")
+    s += T((246, 232), "B", "tn") + F((310, 214), (310, 262), "vk", 9) + V((318, 254), "P", "", "")
+    s += T((330, 254), "5 000 daN en G", "tc") + F((290, 150), (290, 190), "vr", 9) + T((296, 168), "0,3 m/s", "tc")
+    s += cote((170, 196), (240, 196), "1 m", 12) + cote((240, 196), (310, 196), "1 m", 12)
     return s
 
 

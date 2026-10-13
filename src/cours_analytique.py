@@ -73,7 +73,7 @@ def fig_rampe():
 
 def fig_couple():
     s = C((240, 140), 70, "mb") + C((240, 140), 10, "art") + L((240, 140), (330, 90), "fin") + L((240, 140), (330, 160), "fin")
-    s += '<path class="vr" fill="none" d="M172 120 A72 72 0 0 1 270 74"/>' + F((262, 70), (274, 76), "vr", 10)
+    s += '<path class="vrl" d="M172 120 A72 72 0 0 1 270 74"/>' + F((262, 70), (274, 76), "vr", 10)
     s += T((210, 66), "C", "tn tr") + '<path class="fin" d="M290 112 A56 56 0 0 1 295 152"/>' + T((300, 138), "θ", "tn")
     s += T((336, 92), "position 2", "tc") + T((336, 166), "position 1", "tc")
     return s
@@ -84,7 +84,7 @@ def fig_ressort_torsion():
     for i in range(9):
         s += f'<ellipse class="m" cx="{200 + i * 12}" cy="130" rx="7" ry="34"/>'
     s += L((194, 100), (130, 40)) + L((302, 100), (360, 40)) + T((150, 230), "C = k·α : le couple croît avec l'angle", "tc")
-    s += '<path class="vr" fill="none" d="M120 70 A90 90 0 0 1 170 26"/>' + F((164, 24), (174, 28), "vr", 9) + T((112, 40), "α", "tn")
+    s += '<path class="vrl" d="M120 70 A90 90 0 0 1 170 26"/>' + F((164, 24), (174, 28), "vr", 9) + T((112, 40), "α", "tn")
     return s
 
 
@@ -102,7 +102,7 @@ def fig_volant():
     s = '<ellipse class="mb" cx="200" cy="140" rx="40" ry="100"/>' + R(200, 40, 70, 200, "mb")
     s += '<ellipse class="mf" cx="270" cy="140" rx="40" ry="100"/>' + C((270, 140), 6, "art")
     s += L((150, 140), (360, 140), "axe") + T((300, 34), "Ø 2 000", "tc") + T((210, 262), "h = 500", "tc")
-    s += '<path class="vb" fill="none" d="M330 70 A60 90 0 0 1 340 200"/>' + F((340, 190), (338, 204), "vb", 9) + T((346, 140), "ω", "tn tb")
+    s += '<path class="vbl" d="M330 70 A60 90 0 0 1 340 200"/>' + F((340, 190), (338, 204), "vb", 9) + T((346, 140), "ω", "tn tb")
     return s
 
 
@@ -138,7 +138,7 @@ def fig_rendement():
     s += F((60, 170), (166, 170), "vb", 14) + T((60, 158), "W fournie", "tb")
     s += F((314, 170), (420, 170), "vv", 14) + T((340, 158), "W restituée", "tn")
     for x in (200, 240, 280):
-        s += f'<path class="vr" fill="none" d="M{x} 116 q-8 -12 0 -24 t0 -24 t0 -24"/>'
+        s += f'<path class="vrl" d="M{x} 116 q-8 -12 0 -24 t0 -24 t0 -24"/>'
     s += T((210, 34), "W perdue (chaleur, frottements)", "tr")
     return s
 
@@ -147,7 +147,7 @@ def fig_frein_disque():
     s = C((200, 140), 100, "mb") + C((200, 140), 30, "mf") + C((200, 140), 5, "art") + T((206, 132), "O", "tn")
     s += R(120, 52, 48, 64, "mo") + R(232, 52, 48, 64, "mo") + T((112, 44), "plaquettes", "tc")
     s += L((200, 140), (200, 84), "fin") + T((206, 110), "r = 150 mm", "tc")
-    s += '<path class="vb" fill="none" d="M300 110 A104 104 0 0 1 296 182"/>' + F((298, 174), (295, 186), "vb", 9)
+    s += '<path class="vbl" d="M300 110 A104 104 0 0 1 296 182"/>' + F((298, 174), (295, 186), "vb", 9)
     s += T((306, 150), "ω", "tn tb") + R(360, 40, 16, 200, "mb") + F((330, 90), (358, 90), "vr", 9) + F((410, 90), (378, 90), "vr", 9)
     s += T((322, 80), "N", "tn tr") + T((402, 80), "−N", "tn tr") + T((384, 236), "tambour seul", "tc")
     return s

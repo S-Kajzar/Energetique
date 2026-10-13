@@ -262,6 +262,7 @@ CG_CSS = """
 /* ---------- atelier de construction graphique (planches à l'échelle) ---------- */
 .cg{margin:10px 0 8px; max-width:1040px}
 .cg-toolbar{position:sticky; top:0; z-index:4}
+.cg-toolbar .tb-group{flex-wrap:wrap; white-space:normal}
 .cg-toolbar button[data-outil="gomme"][aria-pressed="true"]{background:var(--rouge); border-color:var(--rouge)}
 .cg-toolbar button[data-act="aimant"][aria-pressed="true"]{background:var(--vert-pale); color:var(--vert); border-color:var(--vert)}
 .cg-stage{position:relative; border:1px solid var(--trait); background:#fff; line-height:0; overflow:hidden}
@@ -703,7 +704,7 @@ CG_JS = r"""<script>/* Atelier de construction graphique : outils de géométrie
     inp.setAttribute("aria-label", "Nom du point");
     inp.style.left = (pt.p[0] * m.a + m.e - r.left + this.stage.scrollLeft + 8) + "px";
     inp.style.top = (pt.p[1] * m.d + m.f - r.top + this.stage.scrollTop - 30) + "px";
-    this.stage.appendChild(inp); setTimeout(function () { inp.focus(); inp.select(); }, 0);
+    this.stage.appendChild(inp); inp.focus(); inp.select();
     var fini = false;
     function valider(ok) {
       if (fini) return; fini = true;

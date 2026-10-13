@@ -609,10 +609,12 @@ def planche_skip():
         attendus=[{"type": "vnorme", "en": "G"}, {"type": "vangle", "en": "G", "ref": 90},
                   {"type": "point", "nom": "H", "x": H[0], "y": H[1]}],
         corr=corr, aria="Rail incliné à 70° de O à T, wagonnet en G, vitesse V le long du rail et poids P vertical",
-        legende="Le sol est horizontal ; la verticale lui est perpendiculaire."), Vv, 150 * math.sin(a) * 0.1
+        legende="Le sol est horizontal ; la verticale lui est perpendiculaire."), Vv, 150 * math.sin(a) * 0.1, \
+        [{"t": "vec", "a": Gp, "b": tipv}, {"t": "pt", "p": H, "nom": "H"}]
 
 
-PL_SKIP, VV1, H1 = planche_skip()
+PL_SKIP, VV1, H1, _sol = planche_skip()
+PL_SKIP["solution"] = _sol
 W1 = 3000 * H1
 Pp1 = -3000 * VV1
 Pm1 = -Pp1 / 0.7
@@ -702,6 +704,7 @@ def planche_roues():
                   {"type": "vnorme", "en": "N"}, {"type": "vangle", "en": "N", "ref": 90}],
         corr=corr, aria="Deux roues dentées tangentes en I, de centres A et B ; vitesse du point M de la roue A donnée",
         legende="Cercles primitifs des deux roues ; la roue A tourne à 900 tr/min à l'instant considéré.")
+    cfg["solution"] = [{"t": "vec", "a": I, "b": tI}, {"t": "vec", "a": Nn, "b": tN}]
     return cfg, VI, VN, wB
 
 
@@ -808,6 +811,7 @@ def planche_balancier():
         attendus=[{"type": "vnorme", "en": "G"}, {"type": "vangle", "en": "G", "ref": -90}],
         corr=corr, aria="Balancier horizontal articulé en A, tige de vérin en B, centre de gravité G, extrémité E",
         legende="Le balancier est horizontal à l'instant étudié ; il tourne autour de A.")
+    cfg["solution"] = [{"t": "vec", "a": Gp, "b": tG}]
     return cfg
 
 
@@ -929,7 +933,7 @@ def planche_tirebouchon():
         fond += cg.articulation(P[k], 1.1) + cg.point(P[k], k, pos)
     fond += cg.point(Ah, "A", (2, -3))
     fond += cg.fleche(P["D"], tip(P["D"], VD)) + cg.nom_vecteur((P["D"][0] + 6, y0 + 7), "V", "D", ancre="start")
-    fond += cg.texte((6, y0 - 9), "vis", "tc", "start") + cg.texte((x0 - 6, y0 - c - 8), "collier (fixe)", "tc", "start")
+    fond += cg.texte((6, y0 - 9), "vis", "tc", "start") + cg.texte((4, y0 + c + 14), "collier (fixe)", "tc", "start")
     fond += cg.texte((Ah[0] + 4, y0 + 22), "poignée", "tc", "start")
 
     def tri(Ic, M, Vv):  # correction : rayon IM, vitesse perpendiculaire
@@ -957,6 +961,9 @@ def planche_tirebouchon():
         corr=corr, aria="Pantographe du tire-bouchon : collier fixe C1 C2, barres articulées, croisements D et E sur l'axe, "
                         "poignée articulée en H",
         legende="Par symétrie, les articulations D, E et H, sur l'axe, se déplacent le long de l'axe.")
+    cfg["solution"] = [{"t": "pt", "p": I1, "nom": "I1"}, {"t": "pt", "p": I2, "nom": "I2"}, {"t": "pt", "p": I3, "nom": "I3"},
+                       {"t": "vec", "a": P["Q2"], "b": tip(P["Q2"], VQ2)}, {"t": "vec", "a": P["P3"], "b": tip(P["P3"], VP3)},
+                       {"t": "vec", "a": P["H"], "b": tip(P["H"], VH)}]
     return cfg, I1, I2, I3, cg.norme(VQ2), cg.norme(VP3), cg.norme(VH)
 
 
@@ -1025,7 +1032,7 @@ G4 = [
 # ============================================================ définitions des activités (accueil et configuration)
 def act(key, prefix, tag, level, rub, title, parts, docs, consignes, hero, mots, valt, sub):
     return {"key": key, "prefix": prefix, "tag": tag, "level": level, "rubrique": rub, "title": title, "parts": parts,
-            "docs": docs, "consignes": consignes, "hero": (fg.autonome(hero()), valt, sub.split(" : ")[0] + "."),
+            "docs": docs, "consignes": consignes, "hero": (fg.autonome(hero()), valt, valt + "."),
             "vign": lambda h=hero: fg.autonome(h()), "valt": valt, "mots": mots, "sub": sub}
 
 

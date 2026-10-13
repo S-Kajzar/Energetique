@@ -301,7 +301,7 @@ def carte(tag, title, mots, href, bouton, vign=None, alt="", cls=""):
     """Carte de l'accueil : vignette (dessin SVG), étiquette, titre, mots-clés, bouton."""
     img = '<div class="cv-img cv-vide" aria-hidden="true"></div>'
     if vign:
-        img = f'<img class="cv-img" src="{svg_uri(vign())}" alt="{esc(alt)}" width="480" height="270" loading="lazy">'
+        img = f'<img class="cv-img" src="{svg_uri(vign())}" alt="{esc(alt)}" width="480" height="270">'
     mots_html = '<ul class="cv-mots">' + "".join(f"<li>{m}</li>" for m in mots) + "</ul>"
     btn = f'<a class="btn" href="{href}">{bouton}</a>' if href else '<p class="small ex-meta etat">En cours d\'édition</p>'
     return (f'<article class="mode-card carte-v {cls}">{img}<div class="mc-head"><span class="mc-tag">{tag}</span>'
@@ -512,7 +512,9 @@ COURS_COMMUN_CSS = """
 .simu h3{margin:0 0 8px!important; font:700 1.15rem var(--f-titre); color:var(--bleu)}
 .simu-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 18px}
 @media (max-width:640px){ .simu-grid{grid-template-columns:1fr} }
-.simu-grid label{display:flex; flex-direction:column; gap:4px; font-weight:600; font-size:.92rem}
+.simu-grid label{display:block; font-weight:600; font-size:.92rem}
+.simu-grid label input[type=range],.simu-grid label select{display:block; margin-top:4px}
+.simu-grid output{margin-left:4px}
 .simu-grid output{font:700 1rem var(--f-titre); color:var(--bleu)}
 .simu-grid input[type=range]{width:100%; accent-color:var(--bleu)}
 .simu-grid select{padding:5px; border:1.5px solid var(--encre-2); background:#fff; font:inherit}
@@ -658,6 +660,7 @@ CONTENT_CSS = """<style>
 .fs .ind{font-size:.72em; font-style:normal}
 .fs .vr{stroke:#B42318; fill:#B42318} .fs .vb{stroke:#1F5FA8; fill:#1F5FA8} .fs .vk{stroke:#1C2530; fill:#1C2530} .fs .vv{stroke:#1B7A43; fill:#1B7A43}
 .fs .vr,.fs .vb,.fs .vk,.fs .vv{stroke-width:2.2; stroke-linecap:round}
+.fs .vrl{stroke:#B42318; fill:none; stroke-width:2.2} .fs .vbl{stroke:#1F5FA8; fill:none; stroke-width:2.2}
 .fs .cote{stroke:#5A6670; stroke-width:.9; fill:#5A6670}
 .fs .pointille{fill:none; stroke:#5A6670; stroke-width:1; stroke-dasharray:4 3}
 

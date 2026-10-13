@@ -344,9 +344,9 @@ JS = r"""
       $("cg-rot-xvm").textContent = fr(VA * r / 100, 2) + " m/s"; $("cg-rot-xom").textContent = fr(r / 100, 2);
       $("cg-rot-xw2").textContent = fr(VA / 0.1, 1) + " rad/s";
     });
-    // ---------- bielle-manivelle : OA = 60 px (60 mm), AB = 200 px ; 1 m/s ↔ 4 px
+    // ---------- bielle-manivelle : OA = 60 px (60 mm), AB = 200 px ; 1 m/s ↔ 8 px
     lier(root, "#cg-bm input", function () {
-      var t = val("cg-bm-t") * Math.PI / 180, O = [110, 180], R = 60, L = 200, kv = 4;
+      var t = val("cg-bm-t") * Math.PI / 180, O = [110, 180], R = 60, L = 200, kv = 8;
       var A = [O[0] + R * Math.cos(t), O[1] - R * Math.sin(t)], B = [A[0] + Math.sqrt(L * L - Math.pow(O[1] - A[1], 2)), O[1]];
       var VA = 1500 * Math.PI / 30 * 0.06, va = [-Math.sin(t) * VA * kv, -Math.cos(t) * VA * kv];
       var u = [(B[0] - A[0]) / L, (B[1] - A[1]) / L], p = va[0] * u[0] + va[1] * u[1], vb = p / u[0];
