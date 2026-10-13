@@ -26,7 +26,7 @@ import construction
 import cours_analytique
 import cours_graphique
 import figures
-from commun import esc, fr, svg_uri
+from commun import esc, fr, jpg, svg_uri
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GABARIT = ROOT / "src" / "gabarit-exercice-interactif.html"
@@ -248,8 +248,8 @@ def render_exo_home(e):
              f'<div><b>{e["points"]} points</b><span>{"constructions comprises" if e["n_cg"] else "un par réponse"}</span></div></div>')
     return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><span class="mc-tag">{e["tag"]}</span>{pastille(e.get("level"))}'
             f'<h1 id="home-title">{e["title"]}</h1><p class="home-sub">{e["sub"]}</p></header>{facts}</div>'
-            f'<figure class="home-hero"><img src="{svg_uri(e["hero"][0])}" alt="{esc(e["hero"][1])}" width="480" height="270">'
-            f'<figcaption class="small">{e["hero"][2]}</figcaption></figure></div>')
+            f'<figure class="home-hero"><img src="{jpg(e["image"])[0]}" alt="{esc(e["valt"])}" width="480" height="270">'
+            f'<figcaption class="small">{e["legende"]}</figcaption></figure></div>')
 
 
 MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
@@ -278,11 +278,11 @@ MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
 # ============================================================ ACCUEIL
 COURS = [
     {"key": "cours-analytique", "tag": "Cours 1", "level": "Niveau 1", "title": "Énergétique : approche analytique",
-     "mots": ["Travail", "Énergies", "Puissance", "Rendement", "Théorèmes"], "vign": figures.carte_cours_1,
-     "alt": "Skieur sur un tremplin : l'énergie potentielle devient énergie cinétique"},
+     "mots": ["Travail", "Énergies", "Puissance", "Rendement", "Théorèmes"], "vign": "carte-cours-1",
+     "alt": "Skieur sur un tremplin : l'énergie potentielle devient énergie cinétique (figure du cours)"},
     {"key": "cours-graphique", "tag": "Cours 2", "level": "Niveau 2", "title": "Énergétique : résolution graphique",
-     "mots": ["Échelles", "Projection", "Équiprojectivité", "CIR", "Puissances virtuelles"], "vign": figures.carte_cours_2,
-     "alt": "Bielle et manivelle : vitesses construites par équiprojectivité"},
+     "mots": ["Échelles", "Projection", "Équiprojectivité", "CIR", "Puissances virtuelles"], "vign": "carte-cours-2",
+     "alt": "Disque plein roulant sans glisser : centre instantané de rotation au contact, trajectoire cycloïde"},
 ]
 FORMULAIRE = {"key": "formulaire-energetique", "tag": "Formulaire", "title": "Formulaire d'énergétique",
               "mots": ["Formules", "Unités", "Méthodes graphiques"], "vign": figures.carte_formulaire,
@@ -298,10 +298,12 @@ RUBRIQUES = [("analytique", "Activités : approche analytique"), ("graphique", "
 
 
 def carte(tag, title, mots, href, bouton, vign=None, alt="", cls=""):
-    """Carte de l'accueil : vignette (dessin SVG), étiquette, titre, mots-clés, bouton."""
+    """Carte de l'accueil : vignette, étiquette, titre, mots-clés, bouton. La vignette est la figure du manuel
+    (nom d'une image de src/images) ou, pour une carte sans figure d'origine, un dessin SVG (fonction)."""
     img = '<div class="cv-img cv-vide" aria-hidden="true"></div>'
     if vign:
-        img = f'<img class="cv-img" src="{svg_uri(vign())}" alt="{esc(alt)}" width="480" height="270">'
+        src = jpg(vign)[0] if isinstance(vign, str) else svg_uri(vign())
+        img = f'<img class="cv-img" src="{src}" alt="{esc(alt)}" width="480" height="270">'
     mots_html = '<ul class="cv-mots">' + "".join(f"<li>{m}</li>" for m in mots) + "</ul>"
     btn = f'<a class="btn" href="{href}">{bouton}</a>' if href else '<p class="small ex-meta etat">En cours d\'édition</p>'
     return (f'<article class="mode-card carte-v {cls}">{img}<div class="mc-head"><span class="mc-tag">{tag}</span>'
@@ -310,7 +312,7 @@ def carte(tag, title, mots, href, bouton, vign=None, alt="", cls=""):
 
 def _exo_card(e):
     return carte(e["tag"] + pastille(e.get("level")), e["title"], e["mots"], f'?ex={e["key"]}',
-                 OUVRIR[bool(e.get("etude"))], e["vign"], e["valt"])
+                 OUVRIR[bool(e.get("etude"))], e["image"], e["valt"])
 
 
 def render_hub():
@@ -333,10 +335,9 @@ def render_hub():
             "calcul (approche analytique) et la construction à l'échelle (résolution graphique, avec un atelier de "
             "tracé). Des cours, un formulaire et des activités de deux niveaux, à faire en mode entraînement ou en mode "
             "examen.</p></header></div>"
-            f'<figure class="home-hero"><img src="{svg_uri(figures.hero_accueil())}" alt="Un skieur s\'élance d\'un '
-            f'tremplin : à la hauteur h de départ correspond la vitesse v au bas de la piste" width="480" height="270">'
-            '<figcaption class="small">La loi de conservation de l\'énergie relie la hauteur de départ et la vitesse '
-            "d'envol.</figcaption></figure></div>"
+            f'<figure class="home-hero"><img src="{jpg("accueil")[0]}" alt="Quatre systèmes des activités : cabine '
+            f'd\'ascenseur, roues dentées, frein à sabot, automobile freinant dans une pente" width="720" height="405">'
+            '<figcaption class="small">Quelques systèmes étudiés dans les activités.</figcaption></figure></div>'
             f'<h2 class="home-choose">Les cours</h2><div class="ex-grid cours-grid">{cours}</div>'
             f'<h2 class="home-choose">Le formulaire</h2><div class="ex-grid form-grid">{form}</div>'
             f'{rubs}'
@@ -505,7 +506,7 @@ COURS_COMMUN_CSS = """
 .cours-nav a{font:600 .92rem var(--f-titre); color:var(--encre); background:var(--papier); border:1.5px solid var(--encre); padding:5px 12px; text-decoration:none}
 .cours-nav a:hover{background:var(--jaune-pale)}
 .cours .part-body h3{font:700 1.12rem var(--f-titre); margin:18px 0 6px}
-.formule{display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; border:2px solid var(--rouge); background:#fff; padding:10px 18px; margin:12px 0; max-width:720px}
+.formule{display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; border:2px solid var(--rouge); background:#fff; padding:10px 18px; margin:12px 0; width:fit-content; max-width:100%}
 .formule .f-main{font:700 1.35rem var(--f-titre); line-height:2}
 .formule .f-units{font-size:.9rem; color:var(--encre-2)}
 .simu{border:2px solid var(--bleu); background:var(--bleu-pale); padding:12px 16px; margin:14px 0}
@@ -531,7 +532,7 @@ COURS_COMMUN_CSS = """
 .simu-svg{display:block; width:100%; height:auto; max-width:760px; background:#fff; border:1px solid var(--trait-fin); margin:8px 0; font-family:var(--f-texte)}
 .exemple{background:#F6F7F4; border:1px solid var(--trait-fin); padding:6px 16px; margin-top:12px}
 .exemple h3{font:700 1.05rem var(--f-titre); margin:10px 0 4px}
-.remarque{border-left:6px solid var(--jaune); background:var(--jaune-pale); padding:8px 14px; margin:12px 0; max-width:80ch}
+.remarque{border-left:6px solid var(--jaune); background:var(--jaune-pale); padding:8px 14px; margin:12px 0}
 .remarque p{margin:.2rem 0}
 .quiz{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px}
 .quiz-q{border:1.5px solid var(--encre); background:#fff; padding:8px 14px 10px; margin:0}
@@ -664,9 +665,14 @@ CONTENT_CSS = """<style>
 .fs .cote{stroke:#5A6670; stroke-width:.9; fill:#5A6670}
 .fs .pointille{fill:none; stroke:#5A6670; stroke-width:1; stroke-dasharray:4 3}
 
+/* ---------- le texte occupe toute la largeur blanche des sections, dans les cours comme dans les activités
+   (le gabarit le limite à 72-80 caractères, ce qui laisse un blanc à droite) ---------- */
+.part-body>p,.part-body>ul,.part-body>ol,.data,.q-stem,.q-hint,.q-expl,.selfeval,.recap-head p,.recap .final-detail,
+.es-lead,.home-sub,.consignes p,.remarque{max-width:none}
+
 /* ---------- questions à plusieurs cases (mécanisme « fast-q » du gabarit) ---------- */
 .grp{margin:14px 0 6px; padding:10px 0 12px 14px; border-left:3px solid var(--trait-fin)}
-.grp-fields{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px; max-width:820px}
+.grp-fields{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px}
 .grp-l{display:grid; grid-template-columns:minmax(150px,.9fr) minmax(0,1.3fr); gap:4px 14px; align-items:center; padding:2px 0; border-bottom:1px dashed var(--trait-fin)}
 .grp-lab{font-size:.95rem}
 .grp .sol{display:flex; align-items:center; gap:8px}
@@ -674,13 +680,13 @@ CONTENT_CSS = """<style>
 .grp .sol.is-ok .mark{color:var(--vert)} .grp .sol.is-ko .mark{color:var(--rouge)}
 .grp .sol.is-ok .cg-val{color:var(--vert)} .grp .sol.is-ko .cg-val{color:var(--rouge)}
 .grp .fast-foot .q-status{font-weight:700}
-.grp-sol{max-width:780px; margin:4px 0 8px}
+.grp-sol{margin:4px 0 8px}
 .grp-sol td:last-child{font-weight:600}
 .q-why .why-t{font:700 .95rem var(--f-titre); margin:.6rem 0 .2rem}
 .cg-releve-t{margin:10px 0 0; font:700 .85rem var(--f-titre); text-transform:uppercase; letter-spacing:.04em; color:var(--encre-2)}
 @media (max-width:620px){ .grp-l{grid-template-columns:minmax(0,1fr)} }
 /* ---------- QCM (questions à propositions) ---------- */
-.qcm-opts{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px; max-width:820px}
+.qcm-opts{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px}
 .qcm-o{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:#fff; border:1.5px solid var(--trait); border-radius:3px; padding:8px 12px; font:inherit; font-size:.97rem; color:var(--encre); cursor:pointer}
 .qcm-o:hover:not(:disabled){border-color:var(--encre); background:var(--jaune-pale)}
 .qcm-o:focus-visible{outline:3px solid var(--jaune); outline-offset:1px}

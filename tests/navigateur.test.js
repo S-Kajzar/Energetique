@@ -73,6 +73,11 @@ test("accueil : cours, formulaire, deux rubriques d'activités, études de cas ;
     mots: c.querySelectorAll(".cv-mots li").length, p: c.querySelectorAll("p:not(.etat)").length,
     w: Math.round(c.offsetWidth), h: c.offsetHeight })));
   assert.equal(cartes.length, 2 + 1 + 10 + 5 + 1);
+  // cours et activités : les figures du manuel (JPEG) ; formulaire, atelier et étude à venir : un dessin (SVG)
+  const types = await page.locator("#home .carte-v img.cv-img").evaluateAll((is) => is.map((i) => i.src.slice(5, 15)));
+  assert.equal(types.filter((t) => t === "image/jpeg").length, 16);
+  assert.equal(types.filter((t) => t === "image/svg+").length, 3);
+  assert.ok(await page.locator(".home-hero img").evaluate((i) => i.src.startsWith("data:image/jpeg") && i.naturalWidth > 0));
   for (const c of cartes) {
     assert.ok(c.img > 0, "vignette chargée");
     assert.ok(c.mots >= 3 && c.mots <= 5, JSON.stringify(c));
@@ -99,6 +104,7 @@ test("cours 1 : dix sections, simulateurs, signe du travail, tremplin, cartes, j
   const { context, page, errors } = await open("?ex=cours-analytique");
   assert.match(await text(page, "#home .home-head"), /Cours 1[\s\S]*Niveau 1[\s\S]*approche analytique/);
   assert.equal(await page.locator(".cours-sec").count(), 10);
+  assert.equal(await page.locator(".cours-sec .part-body > p").first().evaluate((e) => getComputedStyle(e).maxWidth), "none");
   const range = (sel, v) => page.locator(sel).evaluate((e, x) => { e.value = x; e.dispatchEvent(new Event("input")); }, v);
   // même énergie, plus vite : plus de puissance
   assert.equal(await text(page, "#ca-palan-w"), "20,0 kJ");
@@ -176,6 +182,9 @@ test("activité A3 en entraînement : réponses justes, 20/20 ; unité manquante
   const { context, page, errors } = await open("?ex=ascenseur-escalier");
   await page.click("[data-mode=training]");
   assert.equal(await page.locator(".part").count(), 2);
+  // le texte occupe toute la largeur blanche de la section
+  for (const sel of [".q-stem", ".q-hint", ".data", ".consignes p"])
+    assert.equal(await page.locator(sel).first().evaluate((e) => getComputedStyle(e).maxWidth), "none", sel);
   const ids = casesSaisies("c");
   assert.equal(ids.length, 8);
   for (const id of ids) await repondre(page, id, REP[id]);

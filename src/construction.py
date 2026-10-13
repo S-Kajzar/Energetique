@@ -325,7 +325,6 @@ CG_CSS = """
 body.cg-full-open{overflow:hidden}
 body.cg-full-open .banner,body.cg-full-open .rail{display:none}
 /* relevé de la construction dans la question */
-.cg-q .grp-fields{max-width:760px}
 .cg-val{font:600 .92rem var(--f-titre); color:var(--bleu)}
 .cg-q .sol{min-height:1.9em}
 @media print{

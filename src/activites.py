@@ -1030,54 +1030,79 @@ G4 = [
 
 
 # ============================================================ définitions des activités (accueil et configuration)
-def act(key, prefix, tag, level, rub, title, parts, docs, consignes, hero, mots, valt, sub):
+# image de chaque activité (accueil et page de l'activité) : la figure du manuel, src/images/carte-*.jpg
+# (outils/extraire_figures.py, puis outils/preparer_images.py) ; texte alternatif et légende
+IMAGES_ACT = {
+    "A1": ("Camion de 14 000 kg roulant à 108 km/h", "Énergie cinétique d'un camion (figure du cours)."),
+    "A2": ("Palan levant puis descendant une charge : poids et vitesse du centre de gravité",
+           "Puissance développée par le poids d'une charge (figure du cours)."),
+    "A3": ("Cabine d'ascenseur entre ses glissières ; escalier roulant incliné à 30°",
+           "Les deux systèmes : la cabine d'ascenseur et l'escalier roulant."),
+    "A4": ("Skieurs en vol au-dessus du tremplin", "Les skieurs que tire le remonte-pente (figure du cours)."),
+    "A5": ("Wagonnet de 300 kg arrivant à 2 m/s sur un amortisseur à ressort, rail incliné de 10°",
+           "Amortisseur de fin de course."),
+    "A6": ("Amortisseur à ressort en bout de rail, course de 100 mm", "L'amortisseur à ressort."),
+    "A7": ("Automobile descendant une pente à 90 km/h, distance d'arrêt x", "Freinage dans une pente."),
+    "A8": ("Vérin de levage suspendu, charge de 3 000 daN descendant à 0,3 m/s", "Vérin de levage."),
+    "A9": ("Frein à sabot : levier articulé en A, sabot appuyé sur le tambour, effort F", "Frein à sabot."),
+    "A10": ("Frein à disque industriel : deux garnitures serrent le tambour de part et d'autre",
+            "Freinage par deux garnitures symétriques (figure du cours)."),
+    "G1": ("Wagonnet guidé sur un rail incliné à 70°, vitesse 0,3 m/s, poids 300 daN", "Wagonnet de levage."),
+    "G2": ("Roue dentée A entraînée par un couple, engrenant avec la roue B", "Roues dentées."),
+    "G3": ("Vérin relié en B à un balancier articulé en A, poids de 5 000 daN", "Levage de balancier."),
+    "G4": ("Tire-bouchon à pantographe posé sur la bouteille, effort F sur la poignée", "Tire-bouchon."),
+}
+
+
+def act(key, prefix, tag, level, rub, title, parts, docs, consignes, mots, sub):
+    n = tag.split()[-1]
+    alt, legende = IMAGES_ACT[n]
     return {"key": key, "prefix": prefix, "tag": tag, "level": level, "rubrique": rub, "title": title, "parts": parts,
-            "docs": docs, "consignes": consignes, "hero": (fg.autonome(hero()), valt, valt + "."),
-            "vign": lambda h=hero: fg.autonome(h()), "valt": valt, "mots": mots, "sub": sub}
+            "docs": docs, "consignes": consignes, "image": "carte-" + n.lower(), "valt": alt, "legende": legende,
+            "mots": mots, "sub": sub}
 
 
 ACTIVITES = [
     act("qcm-travail-energie", "a", "Activité A1", "Niveau 1", "analytique", "QCM : travail et énergie cinétique", A1,
-        ["DT1"], CONSIGNES_QCM, fg.fig_qcm1, ["Couple", "Translation", "Rotation"], "Couple sur un disque, solide en translation",
+        ["DT1"], CONSIGNES_QCM, ["Couple", "Translation", "Rotation"],
         "Trois questions à propositions : travail d'un couple, énergie cinétique en translation et en rotation."),
     act("qcm-puissance", "b", "Activité A2", "Niveau 1", "analytique", "QCM : puissance d'une force, d'un couple", A2,
-        ["DT1"], CONSIGNES_QCM, fg.fig_qcm2, ["Produit scalaire", "Force", "Couple"], "Force et vitesse, couple et vitesse angulaire",
+        ["DT1"], CONSIGNES_QCM, ["Produit scalaire", "Force", "Couple"],
         "Deux questions à propositions : puissance d'une force (produit scalaire) et puissance d'un couple."),
     act("ascenseur-escalier", "c", "Activité A3", "Niveau 1", "analytique", "Ascenseur et escalier roulant", A3, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_ascenseur, ["Travail", "Puissance", "Rendement"], "Cabine d'ascenseur entre ses glissières",
+        CONSIGNES_CALCUL, ["Travail", "Puissance", "Rendement"],
         "Deux levages de personnes : travail et puissance d'une cabine d'ascenseur, rendement d'un escalier roulant."),
     act("remonte-pente-bateau", "d", "Activité A4", "Niveau 1", "analytique", "Remonte-pente et bateau", A4, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_remonte, ["Puissance moyenne", "Rendement", "Résistance"], "Remonte-pente sur une pente de 600 m",
+        CONSIGNES_CALCUL, ["Puissance moyenne", "Rendement", "Résistance"],
         "Puissance moyenne et rendement : le moteur d'un remonte-pente, la résistance à l'avancement d'un bateau."),
     act("amortisseur", "e", "Activité A5", "Niveau 2", "analytique", "Amortisseur de fin de course", A5, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_amortisseur, ["Énergie cinétique", "Ressort", "Théorème"], "Wagonnet arrivant sur un amortisseur",
+        CONSIGNES_CALCUL, ["Énergie cinétique", "Ressort", "Théorème"],
         "Un wagonnet freiné par un ressort : théorème de l'énergie cinétique, raideur et effort en fin de course."),
     act("wagon-pente", "f", "Activité A6", "Niveau 2", "analytique", "Wagon sur une pente de 2 %", A6, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_wagon_pente, ["Conservation", "Ressort", "Course"], "Wagonnet sur une pente douce",
+        CONSIGNES_CALCUL, ["Conservation", "Ressort", "Course"],
         "Conservation de l'énergie : la vitesse au contact de l'amortisseur, puis la course de compression du ressort."),
     act("freinage-pente", "g", "Activité A7", "Niveau 2", "analytique", "Freinage dans une pente", A7, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_auto, ["Distance d'arrêt", "Pente", "Énergie dissipée"], "Automobile freinant dans une pente",
+        CONSIGNES_CALCUL, ["Distance d'arrêt", "Pente", "Énergie dissipée"],
         "Une automobile freine en descente : distance d'arrêt et énergie dissipée par le freinage."),
     act("verin-levage", "h", "Activité A8", "Niveau 2", "analytique", "Vérin de levage", A8, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_verin, ["Décélération", "Effort", "Pression"], "Vérin de levage et sa charge",
+        CONSIGNES_CALCUL, ["Décélération", "Effort", "Pression"],
         "Arrêt d'une charge en fin de course : effort de décélération et pression maximale dans le vérin."),
     act("frein-sabot", "i", "Activité A9", "Niveau 2", "analytique", "Frein à sabot", A9, ["DT1"],
-        CONSIGNES_CALCUL, fg.fig_frein_sabot, ["Moment d'inertie", "Couple de freinage", "Levier"], "Frein à sabot sur un tambour",
+        CONSIGNES_CALCUL, ["Moment d'inertie", "Couple de freinage", "Levier"],
         "Arrêter un tambour en 50 tours : couple de freinage, effort presseur et effort sur le levier."),
     act("frein-deux-sabots", "j", "Activité A10", "Niveau 2", "analytique", "Frein à deux sabots", A10, ["DT1"],
-        CONSIGNES_CALCUL, lambda: fg.fig_frein_sabot(True), ["Deux sabots", "Effort", "Puissance de freinage"],
-        "Frein à deux sabots symétriques",
+        CONSIGNES_CALCUL, ["Deux sabots", "Effort", "Puissance de freinage"],
         "Le même tambour, freiné par deux sabots depuis 400 tr/min : efforts sur les leviers et puissance de freinage."),
     act("skip-chargement", "k", "Activité G1", "Niveau 1", "graphique", "Skip de chargement", G1, ["DT1", "DT2"],
-        CONSIGNES_GRAPHIQUE, fg.fig_skip, ["Projection", "Puissance du poids", "Échelles"], "Wagonnet sur un rail incliné à 70°",
+        CONSIGNES_GRAPHIQUE, ["Projection", "Puissance du poids", "Échelles"],
         "Projeter pour calculer : composante verticale de la vitesse, dénivellation, puis énergie et puissance de levage."),
     act("roues-dentees", "l", "Activité G2", "Niveau 2", "graphique", "Roues dentées", G2, ["DT1", "DT2"],
-        CONSIGNES_GRAPHIQUE, fg.fig_roues, ["Répartition linéaire", "Roulement", "Mise en vitesse"], "Deux roues dentées en prise",
+        CONSIGNES_GRAPHIQUE, ["Répartition linéaire", "Roulement", "Mise en vitesse"],
         "Vitesses construites au contact de deux roues dentées, puis mise en vitesse par le théorème de l'énergie cinétique."),
     act("balancier", "m", "Activité G3", "Niveau 2", "graphique", "Levage de balancier", G3, ["DT1", "DT2"],
-        CONSIGNES_GRAPHIQUE, fg.fig_balancier, ["Triangle des vitesses", "Huygens", "Pression"], "Balancier manœuvré par un vérin",
+        CONSIGNES_GRAPHIQUE, ["Triangle des vitesses", "Huygens", "Pression"],
         "Un balancier manœuvré par un vérin : triangle des vitesses, puis amortissement en fin de course."),
     act("tire-bouchon", "n", "Activité G4", "Niveau 2", "graphique", "Tire-bouchon", G4, ["DT1", "DT2"],
-        CONSIGNES_GRAPHIQUE, fg.fig_tirebouchon, ["CIR", "Puissances virtuelles", "Pantographe"], "Tire-bouchon à pantographe",
+        CONSIGNES_GRAPHIQUE, ["CIR", "Puissances virtuelles", "Pantographe"],
         "Un pantographe de barres articulées : vitesses par les centres instantanés de rotation, puis T = 3·F."),
 ]

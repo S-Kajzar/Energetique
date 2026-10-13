@@ -4,7 +4,10 @@ numériques du moteur Grading (valeur, tolérance, unité et ses multiples), blo
 import base64
 import html
 import math
+import pathlib
+import struct
 
+IMAGES = pathlib.Path(__file__).resolve().parent / "images"
 G = 9.81  # accélération de la pesanteur retenue dans tout le site (m/s²), comme dans le cours
 
 
@@ -45,6 +48,19 @@ def vec(lettre, indice=""):
 def svg_uri(svg):
     """Dessin SVG autonome intégré en data URI (vignettes de l'accueil)."""
     return "data:image/svg+xml;base64," + base64.b64encode(svg.encode("utf-8")).decode()
+
+
+def jpg(name):
+    """Image JPEG de src/images intégrée en data URI ; dimensions lues dans le segment SOF."""
+    data = (IMAGES / f"{name}.jpg").read_bytes()
+    i = 2
+    while i < len(data):
+        marker, size = data[i + 1], struct.unpack(">H", data[i + 2:i + 4])[0]
+        if marker in (0xC0, 0xC1, 0xC2):
+            h, w = struct.unpack(">HH", data[i + 5:i + 9])
+            return "data:image/jpeg;base64," + base64.b64encode(data).decode(), w, h
+        i += 2 + size
+    raise ValueError(f"{name}.jpg : dimensions introuvables")
 
 
 def donnees(*items, titre="Données"):

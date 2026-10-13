@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Figures redessinées en SVG (les pages fournies sont des photographies du manuel, peu lisibles) : illustration de
-l'accueil, vignettes des cartes et figures des énoncés. Toutes sur un canevas de 480 × 270 (format des cartes) ;
+"""Figures redessinées en SVG (les pages fournies sont des photographies du manuel, peu lisibles) : figures des
+énoncés, et vignettes des trois cartes de l'accueil qui n'ont pas de figure d'origine (formulaire, atelier, étude). Toutes sur un canevas de 480 × 270 (format des cartes) ;
 la même figure sert de vignette (SVG autonome, style intégré) et de figure d'énoncé (SVG dans la page)."""
 import math
 
@@ -170,52 +170,6 @@ def tremplin(lab=True):
         s += T((300, 100), "Énergie potentielle", "tb", "end") + T((300, 116), "m·g·h", "tc", "end")
         s += F((310, 120), (250, 168), "vb", 10) + T((40, 125), "Énergie cinétique", "tr") + T((40, 143), "½·m·v²", "tc")
     return s
-
-
-def hero_accueil():
-    return autonome(tremplin())
-
-
-def carte_cours_1():
-    s = tremplin(lab=False)
-    for i, (h1, h2, lab) in enumerate([(70, 0, "Ep"), (35, 35, ""), (0, 70, "Ec")]):
-        x = 26 + i * 34
-        s += R(x, 110 - h1, 12, h1, "mb") if h1 else ""
-        s += R(x + 13, 110 - h2, 12, h2, "mo") if h2 else ""
-    s += L((20, 110), (125, 110)) + T((26, 128), "Ep", "tb") + T((92, 128), "Ec", "tr")
-    return autonome(s)
-
-
-def bielle_manivelle(o=(110, 170), r=55, ang=55, Lb=200, vec=True):
-    """Bielle-manivelle : manivelle OA de rayon r à ang degrés, bielle AB de longueur Lb, piston B sur l'axe."""
-    a = math.radians(ang)
-    A = (o[0] + r * math.cos(a), o[1] - r * math.sin(a))
-    bx = A[0] + math.sqrt(Lb ** 2 - (o[1] - A[1]) ** 2)
-    B = (bx, o[1])
-    s = L((o[0] - 30, o[1]), (B[0] + 80, o[1]), "axe") + C(o, r, "pointille")
-    s += R(B[0] - 26, o[1] - 18, 52, 36, "mb", 3) + L(o, A) + L(A, B)
-    s += pivot(o) + C(A, 5, "art") + C(B, 5, "art")
-    s += T((o[0] - 22, o[1] - 10), "O", "tn") + T((A[0] - 18, A[1] - 6), "A", "tn") + T((B[0] - 4, o[1] - 24), "B", "tn")
-    if vec:
-        # vitesse de A perpendiculaire à OA, vitesse de B horizontale (équiprojectivité le long de AB)
-        k = 1.25
-        tA = (A[0] + math.sin(a) * 60 * k, A[1] - math.cos(a) * 60 * k)
-        s += F(A, tA, "vb", 10)
-        d = ((B[0] - A[0]) / Lb, (B[1] - A[1]) / Lb)
-        proj = (tA[0] - A[0]) * d[0] + (tA[1] - A[1]) * d[1]
-        vb = proj / d[0]
-        s += F(B, (B[0] + vb, B[1]), "vr", 10)
-        pa = (A[0] + d[0] * proj, A[1] + d[1] * proj)
-        pb = (B[0] + d[0] * proj, B[1] + d[1] * proj)
-        s += L(tA, pa, "pointille") + L((B[0] + vb, B[1]), pb, "pointille") + L(A, pa, "vv") + L(B, pb, "vv")
-        s += V((tA[0] + 6, tA[1] + 2), "V", "A", "tb") + V((B[0] + vb - 4, B[1] - 12), "V", "B", "tr", "end")
-    return s, A, B
-
-
-def carte_cours_2():
-    s, _a, _b = bielle_manivelle()
-    s += T((24, 40), "même projection sur (AB)", "tc") + L((24, 46), (60, 46), "vv")
-    return autonome(s)
 
 
 def carte_formulaire():

@@ -7,7 +7,7 @@ page autonome (un seul fichier HTML, aucune dépendance externe, utilisable hors
 
 | Adresse | Contenu |
 |---|---|
-| `index.html` | accueil, en cartes illustrées à mots-clés : les cours (pastilles Niveau 1 / Niveau 2), le formulaire, les activités en deux rubriques (approche analytique, résolution graphique), l'atelier libre, les études de cas |
+| `index.html` | accueil, en cartes illustrées par les figures des activités et des cours, à mots-clés : les cours (pastilles Niveau 1 / Niveau 2), le formulaire, les activités en deux rubriques (approche analytique, résolution graphique), l'atelier libre, les études de cas |
 | `?ex=cours-analytique` | Cours 1 — Énergétique : approche analytique (Niveau 1) : énergie et puissance, travail d'une force et d'un couple, énergies potentielle et cinétique, puissance, rendement, théorèmes ; figures redessinées, simulateurs, cartes, jeu, quiz |
 | `?ex=cours-graphique` | Cours 2 — Énergétique : résolution graphique (Niveau 2) : échelles, travail = aire, produit scalaire par projection, répartition linéaire des vitesses, équiprojectivité, CIR, puissances virtuelles, atelier de construction et planche libre, quiz |
 | `?ex=formulaire-energetique` | formulaire d'énergétique et fiche des méthodes graphiques (les documents DT1 et DT2 des activités) |
@@ -42,8 +42,10 @@ celui des dépôts RDM et « Chaîne fonctionnelle », recopié sans modificatio
 contenu décrit dans `src/`.
 
 ```sh
-python3 src/generer.py       # écrit index.html
-python3 outils/reponses.py   # seulement si les activités changent : réécrit tests/reponses.js
+python3 outils/extraire_figures.py cours.pdf exercices.pdf exo2.pdf  # seulement pour redécouper les figures du manuel
+python3 outils/preparer_images.py   # seulement si src/images/originaux change : vignettes et montage d'accueil
+python3 src/generer.py              # écrit index.html
+python3 outils/reponses.py          # seulement si les activités changent : réécrit tests/reponses.js
 ```
 
 ## Tester
@@ -67,7 +69,11 @@ parcours navigateur vérifient qu'une copie entièrement juste donne 20/20, sans
 | `src/construction.py` | atelier de construction : dessin des planches en millimètres, moteur JavaScript des outils, style |
 | `src/cours_analytique.py` | cours 1 : texte du chapitre, figures, simulateurs, quiz |
 | `src/cours_graphique.py` | cours 2 : méthodes graphiques, démonstrations interactives, planche libre, quiz |
-| `src/figures.py` | figures redessinées en SVG : illustration de l'accueil, vignettes des cartes, figures des énoncés |
+| `src/figures.py` | figures redessinées en SVG : figures des énoncés, vignettes des cartes sans figure d'origine |
+| `src/images/originaux/` | figures du manuel découpées dans les pages photographiées et nettoyées |
+| `src/images/` | vignettes des cartes (`carte-*.jpg`) et montage de l'accueil (`accueil.jpg`), intégrés en data URI |
+| `outils/extraire_figures.py` | découpe et nettoyage des figures du manuel (à partir des PDF fournis) |
+| `outils/preparer_images.py` | vignettes des cartes et montage de l'accueil |
 | `outils/reponses.py` | écrit `tests/reponses.js` à partir des activités |
 | `tests/` | tests Node et Playwright |
 | `.github/workflows/static.yml` | publication GitHub Pages (déclenchée sur la branche `main`) |

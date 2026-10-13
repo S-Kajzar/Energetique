@@ -17,11 +17,26 @@ deux pages de QCM et d'exercices, plus une page d'exercices de dynamique). **Dé
   même taille avec 3 à 5 mots-clés, pastilles Niveau 1 / Niveau 2, rubrique « Études de cas » annoncée « En cours
   d'édition »). Le contenu est réparti en modules : `commun.py`, `activites.py`, `construction.py`,
   `cours_analytique.py`, `cours_graphique.py`, `figures.py`.
-- **Figures** : les pages fournies sont des photographies du manuel (ombres, pages courbées, textes pâles). Aucune
-  n'est intégrée : toutes les figures utiles sont **redessinées en SVG** (`src/figures.py`, et les planches dans
-  `src/activites.py`), y compris l'illustration de l'accueil et les vignettes des cartes. Il n'y a donc ni photo ni
-  image matricielle dans la page, et pas de chaîne de préparation d'images. **Les PDF fournis ne sont pas versionnés**
-  (photographies d'un manuel, 10 Mio) : à joindre au dépôt si l'on souhaite les conserver comme source.
+- **Figures des cours et des énoncés** : les pages fournies sont des photographies du manuel (ombres, pages courbées,
+  textes pâles). Les figures des cours et des énoncés sont **redessinées en SVG** (`src/figures.py`, et les planches
+  dans `src/activites.py`), pour être lisibles et, souvent, interactives.
+- **Images de l'accueil et des pages d'activité** : ce sont **les figures du manuel**, et non plus des schémas
+  redessinés. `outils/extraire_figures.py` les découpe dans les pages photographiées et les nettoie (division par
+  l'éclairage de la photo : ombres et dégradés disparaissent, fond blanc ; niveaux ; couleurs ravivées) ; les figures
+  découpées sont versionnées dans `src/images/originaux/`. `outils/preparer_images.py` en fait les vignettes des
+  cartes (480 × 270, figure entière centrée sur fond blanc ; deux figures côte à côte pour A3) et le montage en tête de
+  l'accueil (cabine d'ascenseur, roues dentées, frein à sabot, automobile). Correspondance : cours 1, le tremplin de
+  l'ouverture du chapitre ; cours 2, le disque qui roule sans glisser (fig. 14) ; A1, le camion (fig. 11) ; A2, le
+  palan en montée et en descente (fig. 16) ; A3, l'ascenseur et l'escalier (fig. 22 et 23) ; A4, les skieurs de
+  l'ouverture du chapitre (les exercices 10 et 11 n'ont pas de figure) ; A5, l'amortisseur (fig. 26) ; A6, la même
+  figure resserrée sur le ressort ; A7, fig. 27 ; A8, fig. 31 ; A9, fig. 33 ; A10, le frein à disque industriel à deux
+  garnitures (fig. 18) ; G1 à G4, fig. 25, 34, 32 et 24. Les trois cartes sans figure d'origine (formulaire, atelier
+  libre, étude à venir) gardent un dessin. **Les PDF fournis ne sont pas versionnés** (photographies d'un manuel,
+  10 Mio) : `extraire_figures.py` les prend en arguments.
+- **Mise en page** : le texte occupe **toute la largeur blanche** des sections, dans les cours comme dans les
+  activités (énoncés, données, questions, corrections, consignes) : les limites de 72 à 80 caractères par ligne du
+  gabarit sont levées par `generer.py` (le gabarit lui-même n'est pas modifié). Les encadrés de formules épousent
+  leur contenu.
 - **Numérotation** : « Activité A1… A10 » (approche analytique) et « Activité G1… G4 » (résolution graphique) ; la
   pastille donne le niveau. L'accueil a deux rubriques d'activités, plus une carte « Atelier de construction libre ».
 
@@ -159,7 +174,7 @@ avec le gabarit (même barre d'outils, mêmes couleurs, mêmes modes, même nota
 ## Points signalés sans modification
 
 - Le niveau des pastilles (Niveau 1 : QCM, A3, A4, G1 ; Niveau 2 : les autres) est une proposition.
-- Poids de la page : `index.html` ≈ 830 Kio, sans aucune image matricielle.
+- Poids de la page : `index.html` ≈ 1,4 Mio, dont 310 Kio d'images (17 JPEG : vignettes et montage d'accueil).
 
 ## Vérifications effectuées
 
