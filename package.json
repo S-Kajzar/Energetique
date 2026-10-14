@@ -1,7 +1,7 @@
 {
   "name": "energetique-interactive",
   "private": true,
-  "description": "Cours et activités interactifs autonomes : énergétique (travail, énergies, puissance, rendement, théorèmes), approche analytique et résolution graphique avec un atelier de construction",
+  "description": "Cours et activités interactifs autonomes : énergétique (travail, énergies, puissance, rendement, théorèmes, travail virtuel)",
   "scripts": {
     "generer": "python3 src/generer.py",
     "reponses": "python3 outils/reponses.py",

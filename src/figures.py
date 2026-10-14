@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """Figures redessinées en SVG (les pages fournies sont des photographies du manuel, peu lisibles) : figures des
-énoncés, et vignettes des trois cartes de l'accueil qui n'ont pas de figure d'origine (formulaire, atelier, étude). Toutes sur un canevas de 480 × 270 (format des cartes) ;
+énoncés, et vignettes des deux cartes de l'accueil qui n'ont pas de figure d'origine (formulaire, étude à venir). Toutes sur un canevas de 480 × 270 (format des cartes) ;
 la même figure sert de vignette (SVG autonome, style intégré) et de figure d'énoncé (SVG dans la page)."""
 import math
 
@@ -179,21 +179,6 @@ def carte_formulaire():
               "P = F · V · cos θ = C · ω", "η = W restituée / W fournie"]
     for i, t in enumerate(lignes):
         s += T((130, 78 + i * 25), t, "", "start", 14)
-    return autonome(s)
-
-
-def carte_atelier():
-    s = ""
-    for x in range(20, 480, 20):
-        s += L((x, 0), (x, 270), "fin").replace('class="fin"', 'class="fin" opacity=".25"')
-    for y in range(10, 270, 20):
-        s += L((0, y), (480, y), "fin").replace('class="fin"', 'class="fin" opacity=".25"')
-    s += L((60, 220), (400, 50), "axe") + L((150, 40), (330, 250), "axe")
-    s += L((90, 200), (300, 200)) + C((300, 200), 70, "pointille") + F((90, 200), (210, 120), "vb", 12)
-    s += C((258, 132), 9, "mo") + T((270, 125), "aimantation", "tc")
-    s += T((214, 112), "V", "tn tb") + R(20, 20, 210, 30, "mf", 3)
-    for i, t in enumerate(["Point", "Droite", "⊥", "∥", "Vecteur"]):
-        s += T((30 + i * 40, 40), t, "tc")
     return autonome(s)
 
 

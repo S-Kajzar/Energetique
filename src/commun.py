@@ -160,11 +160,5 @@ def QCM(stem, opts, bonnes, why, img=""):
             "opts": list(zip(keys, opts)), "fields": [("Réponse", grader, attendu)]}
 
 
-def CG(stem, hint, planche, fields, why):
-    """Construction graphique : la planche (atelier de construction) relève le tracé de l'élève et remplit les
-    champs masqués que lit le moteur ; fields = [(libellé, correcteur, réponse attendue affichée)]."""
-    return {"kind": "grp", "cg": planche, "stem": stem, "hint": hint, "fields": fields, "why": why}
-
-
 def QBAR(docs, ans="ci-dessous"):
     return {"kind": "qbar", "docs": list(docs), "ans": ans}

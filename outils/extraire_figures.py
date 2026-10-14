@@ -25,7 +25,6 @@ FIGURES = {
     "fig-tremplin": ("cours", 0, (0.085, 0.705, 0.890, 0.940), "Le skieur sur le tremplin (ouverture du chapitre)"),
     "fig-skieur": ("cours", 0, (0.090, 0.705, 0.420, 0.935), "Le skieur en vol (ouverture du chapitre)"),
     "fig-camion": ("cours", 5, (0.525, 0.024, 0.985, 0.172), "Fig. 11 — Exemple : camion"),
-    "fig-disque": ("cours", 6, (0.362, 0.345, 0.880, 0.487), "Fig. 14 — Disque plein roulant sans glisser"),
     "fig-palan-puissance": ("cours", 7, (0.660, 0.360, 0.972, 0.500), "Fig. 16 — Puissance développée par le palan"),
     "fig-frein-disque": ("cours", 9, (0.075, 0.060, 0.985, 0.300), "Fig. 18 — Frein à disque industriel"),
     "fig-ascenseur": ("exercices", 0, (0.560, 0.415, 0.915, 0.548), "Fig. 22 — Cabine d'ascenseur"),

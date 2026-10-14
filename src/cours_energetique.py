@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Cours 1 — Énergétique : approche analytique (?ex=cours-analytique).
+"""Le cours — Énergétique : travail, énergies, puissance (?ex=cours-energetique).
 
 Source : le chapitre « Énergétique » fourni (pages photographiées du manuel). Tout son texte est repris, section par
 section : notions d'énergie et de puissance, travail d'une force et d'un couple, énergies potentielle et cinétique,
 puissance, rendement, théorèmes. Les figures sont redessinées en SVG ; plusieurs deviennent interactives (énergie et
-puissance du palan, signe du travail, tremplin) et les exemples chiffrés deviennent des calculateurs. Les méthodes
-graphiques (aire sous une courbe, projection, vitesses construites) font l'objet du cours 2."""
+puissance du palan, signe du travail, travail du ressort lu comme une aire, tremplin) et les exemples chiffrés
+deviennent des calculateurs. Le principe du travail virtuel, annoncé dans les objectifs du chapitre mais absent des
+pages fournies, est rédigé pour le site (activité 2.1, le tire-bouchon)."""
 import math
 
 from commun import eq, fr, frac, vec
@@ -206,9 +207,45 @@ QUIZ = [
 ]
 
 
+AIRE_RESSORT = (
+    '<div class="simu" id="ca-aire"><h3>Le travail du ressort, une aire</h3><div class="simu-grid">'
+    '<label>Raideur k (N/mm) <output id="ca-aire-k-o"></output><input type="range" id="ca-aire-k" min="2" max="20" step="1" value="10"></label>'
+    '<label>Flèche initiale f<sub>1</sub> (mm) <output id="ca-aire-f1-o"></output><input type="range" id="ca-aire-f1" min="0" max="40" step="1" value="10"></label>'
+    '<label>Flèche finale f<sub>2</sub> (mm) <output id="ca-aire-f2-o"></output><input type="range" id="ca-aire-f2" min="0" max="40" step="1" value="30"></label></div>'
+    '<svg class="simu-svg fs" viewBox="0 0 480 270" role="img" aria-label="Charge du ressort en fonction de la flèche, '
+    'aire du trapèze entre f1 et f2"><g id="ca-aire-grille"></g><path id="ca-aire-zone" fill="rgba(31,95,168,.25)" stroke="none"/>'
+    '<line class="m" x1="60" y1="230" x2="450" y2="230"/><line class="m" x1="60" y1="230" x2="60" y2="20"/>'
+    '<path class="m" id="ca-aire-droite"/><text x="440" y="250" class="tn">f</text><text x="40" y="30" class="tn">F</text>'
+    '<text x="70" y="40" class="tc" id="ca-aire-leg"></text></svg>'
+    '<div class="simu-out"><div><span>Charges F<sub>1</sub> et F<sub>2</sub></span><b id="ca-aire-xf">–</b></div>'
+    '<div><span>Aire = travail</span><b id="ca-aire-xw">–</b></div><div><span>Carreaux comptés</span><b id="ca-aire-xc">–</b></div></div>'
+    '<p class="small">Un carreau du quadrillage vaut 5 mm × 50 N = 0,25 J : compter les carreaux donne l\'ordre de grandeur, '
+    "la formule la valeur exacte. Pour une force qui varie autrement, l'aire se découpe en bandes.</p></div>")
+
+TRAVAIL_VIRTUEL = (
+    "<h3>Principe du travail virtuel</h3>"
+    "<p>Les objectifs du chapitre annoncent ce principe ; les pages fournies s'arrêtent avant lui. Pour un mécanisme "
+    "en équilibre dont les liaisons sont parfaites (sans frottement), la somme des travaux des efforts extérieurs est "
+    "nulle pour tout petit déplacement imaginé (virtuel) compatible avec les liaisons. Les actions des liaisons "
+    "parfaites ne travaillent pas : elles n'apparaissent pas dans le bilan.</p>" +
+    formule("Σ δ<i>W</i>(efforts extérieurs) = 0 ⇒ <i>F</i><sub>e</sub>·δ<i>x</i><sub>e</sub> = <i>F</i><sub>s</sub>·δ<i>x</i><sub>s</sub>",
+            "δ<i>x</i> : déplacements virtuels des points d'application, projetés sur la direction des efforts") +
+    "<p>Le rapport des efforts est l'inverse du rapport des déplacements : il suffit de la géométrie du mécanisme. "
+    "Activité 2.1 : le tire-bouchon, dont la poignée se déplace trois fois plus que la vis, multiplie l'effort par "
+    "trois.</p>"
+    '<div class="simu" id="ca-lev"><h3>Levier : rapport des déplacements, rapport des efforts</h3><div class="simu-grid">'
+    '<label>Bras d\'entrée a (mm) <output id="ca-lev-a-o"></output><input type="range" id="ca-lev-a" min="100" max="800" step="50" value="600"></label>'
+    '<label>Bras de sortie b (mm) <output id="ca-lev-b-o"></output><input type="range" id="ca-lev-b" min="50" max="600" step="50" value="200"></label>'
+    '<label>Effort d\'entrée F<sub>e</sub> (N) <output id="ca-lev-f-o"></output><input type="range" id="ca-lev-f" min="10" max="500" step="10" value="100"></label></div>'
+    '<div class="simu-out"><div><span>Rapport δx<sub>e</sub> / δx<sub>s</sub></span><b id="ca-lev-r">–</b></div>'
+    '<div><span>Effort de sortie F<sub>s</sub></span><b id="ca-lev-fs">–</b></div><div><span>Travaux pour δθ = 0,01 rad</span>'
+    '<b id="ca-lev-w">–</b></div></div><p class="small">Levier pivotant en O : pour une petite rotation δθ, chaque point '
+    "se déplace de sa distance à O multipliée par δθ ; les deux travaux sont égaux.</p></div>")
+
+
 def render(A):
     s = A.course_head(
-        "Cours 1", "Niveau 1", "Énergétique : approche analytique",
+        "Cours", "", "Énergétique : travail, énergies, puissance",
         "Définir l'énergie et la puissance ; calculer le travail d'une force et d'un couple ; énergies potentielle et "
         "cinétique (translation, rotation, mouvement plan) ; rendement ; théorème de l'énergie cinétique et loi de "
         "conservation de l'énergie.")
@@ -296,8 +333,8 @@ def render(A):
          "A<sub>2</sub> ; AA′ = d<i>s</i> est le déplacement élémentaire de A. Entre A et A′ : d<i>W</i> = " + vec("F") +
          "·" + vec("ds") + " = <i>F</i>·d<i>s</i>·cos θ. Entre A<sub>1</sub> et A<sub>2</sub> :</p>" +
          formule(f"<i>W</i><sub>1/2</sub> = ∫<sub><i>s</i>₁</sub><sup><i>s</i>₂</sup> <i>F</i>·cos θ·d<i>s</i>",
-                 "somme des travaux élémentaires ; graphiquement : l'aire sous la courbe <i>F</i>·cos θ en fonction de "
-                 "<i>s</i> (cours 2)"))
+                 "somme des travaux élémentaires ; c'est aussi l'aire sous la courbe <i>F</i>·cos θ en fonction de "
+                 "<i>s</i> (voir le ressort, section 4)"))
     s += A.course_section(2, "ca-travail", "Travail d'une force", b)
 
     # ---------- II.4–5 couple et ressorts de torsion
@@ -351,8 +388,11 @@ def render(A):
                  f"{frac('<i>k</i>', '2')}·(<i>f</i><sub>2</sub>² − <i>f</i><sub>1</sub>²)",
                  "<i>E</i><sub>p</sub> en J ; <i>k</i> en N·m<sup>−1</sup> ; <i>f</i> en m") +
          "<p>La compression du ressort permet d'accumuler de l'énergie potentielle. Pour les ressorts de torsion : "
-         "<i>E</i><sub>p</sub> = ½·<i>k</i>·α² (α en rad, <i>k</i> en N·m·rad<sup>−1</sup>). Le travail du ressort est "
-         "aussi l'aire sous la droite <i>F</i> = <i>k</i>·<i>f</i> : le cours 2 la fait varier à la souris.</p>")
+         "<i>E</i><sub>p</sub> = ½·<i>k</i>·α² (α en rad, <i>k</i> en N·m·rad<sup>−1</sup>).</p>"
+         "<p>Sur le graphe de la charge en fonction de la flèche (figure 9 du manuel), le travail <i>W</i><sub>1/2</sub> "
+         "est l'<b>aire</b> comprise entre la droite <i>F</i> = <i>k</i>·<i>f</i> et l'axe des flèches, de "
+         "<i>f</i><sub>1</sub> à <i>f</i><sub>2</sub> : un trapèze, d'aire (<i>F</i><sub>1</sub> + <i>F</i><sub>2</sub>)/2 × "
+         "(<i>f</i><sub>2</sub> − <i>f</i><sub>1</sub>), ce qui redonne la formule.</p>" + AIRE_RESSORT)
     s += A.course_section(4, "ca-ep", "Énergie potentielle", b)
 
     # ---------- IV. énergie cinétique
@@ -524,7 +564,8 @@ def render(A):
          '<div class="simu-out"><div><span>Énergie potentielle (skieur de 80 kg)</span><b id="ca-tremplin-ep">–</b></div>'
          '<div><span>Énergie cinétique</span><b id="ca-tremplin-ec">–</b></div><div><span>Vitesse</span><b id="ca-tremplin-v">–</b></div></div>'
          '<p class="small">Sans frottement, la somme Ep + Ec reste constante : au bas de la piste, ½·<i>m</i>·<i>v</i>² = '
-         "<i>m</i>·<i>g</i>·<i>h</i>, soit <i>v</i> = √(2·<i>g</i>·<i>h</i>), indépendante de la masse.</p></div>")
+         "<i>m</i>·<i>g</i>·<i>h</i>, soit <i>v</i> = √(2·<i>g</i>·<i>h</i>), indépendante de la masse.</p></div>" +
+         TRAVAIL_VIRTUEL)
     s += A.course_section(8, "ca-theoremes", "Théorèmes sur l'énergie", b)
 
     # ---------- l'essentiel, jeu, quiz
@@ -535,14 +576,13 @@ def render(A):
          A.jeu_html(JEU_ENERGIES, CHOIX_ENERGIES, "ca-jeu"))
     s += A.course_section(9, "ca-essentiel", "L'essentiel à retenir", b)
     s += A.quiz_section(10, "ca-quiz", QUIZ, "caq")
-    s += ('<div class="cours-foot"><a class="btn" href="?ex=cours-graphique">Cours 2 : résolution graphique</a>'
-          '<a class="btn" href="?ex=formulaire-energetique">Formulaire</a>'
+    s += ('<div class="cours-foot"><a class="btn" href="?ex=formulaire-energetique">Formulaire</a>'
           '<a class="btn ghost" href="?">Retour à l\'accueil</a></div></div>')
     return s
 
 
 JS = r"""
-  function initCoursAnalytique(root) {
+  function initCoursEnergetique(root) {
     function $(i) { return document.getElementById(i); }
     function val(i) { return parseFloat($(i).value); }
     function energie(w) { return Math.abs(w) >= 1e6 ? frs(w / 1e6, 3) + " MJ" : Math.abs(w) >= 1e3 ? frs(w / 1e3, 3) + " kJ" : frs(w, 3) + " J"; }
@@ -605,6 +645,31 @@ JS = r"""
       $("ca-tremplin-h-o").textContent = h + " m"; $("ca-tremplin-s-o").textContent = Math.round(s * 100) + " %";
       $("ca-tremplin-ep").textContent = energie(ep); $("ca-tremplin-ec").textContent = energie(ec);
       $("ca-tremplin-v").textContent = fr(v, 1) + " m/s (" + fr(v * 3.6, 0) + " km/h)";
+    });
+    // travail du ressort : 1 mm de flèche = 9 px ; 1 N = 0,2 px (charge au plus 800 N)
+    (function () {
+      var g = $("ca-aire-grille");
+      for (var i = 0; i <= 40; i += 5) svgEl("line", { x1: 60 + i * 9, y1: 230, x2: 60 + i * 9, y2: 70, "class": "fin", opacity: ".35" }, g);
+      for (var j = 0; j <= 800; j += 50) svgEl("line", { x1: 60, y1: 230 - j * 0.2, x2: 420, y2: 230 - j * 0.2, "class": "fin", opacity: ".35" }, g);
+    })();
+    lier(root, "#ca-aire input", function () {
+      var k = val("ca-aire-k"), f1 = val("ca-aire-f1"), f2 = val("ca-aire-f2"), a = Math.min(f1, f2), b = Math.max(f1, f2);
+      function X(f) { return 60 + f * 9; } function Y(F) { return 230 - Math.min(F, 800) * 0.2; }
+      $("ca-aire-k-o").textContent = k + " N/mm"; $("ca-aire-f1-o").textContent = f1 + " mm"; $("ca-aire-f2-o").textContent = f2 + " mm";
+      $("ca-aire-droite").setAttribute("d", "M60 230L" + X(40) + " " + Y(40 * k));
+      $("ca-aire-zone").setAttribute("d", "M" + X(a) + " 230L" + X(a) + " " + Y(k * a) + "L" + X(b) + " " + Y(k * b) + "L" + X(b) + " 230Z");
+      var W = k / 2 * (b * b - a * a) / 1000;  // N/mm × mm² = N·mm, soit 10⁻³ J
+      $("ca-aire-xf").textContent = fr(k * f1, 0) + " N → " + fr(k * f2, 0) + " N";
+      $("ca-aire-xw").textContent = (f2 >= f1 ? "" : "−") + fr(W, 2) + " J";
+      $("ca-aire-xc").textContent = fr(W / 0.25, 1) + " carreaux";
+      $("ca-aire-leg").textContent = f2 >= f1 ? "compression : travail reçu par le ressort" : "détente : travail rendu par le ressort";
+    });
+    // levier : travail virtuel
+    lier(root, "#ca-lev input", function () {
+      var a = val("ca-lev-a"), b = val("ca-lev-b"), F = val("ca-lev-f");
+      $("ca-lev-a-o").textContent = a + " mm"; $("ca-lev-b-o").textContent = b + " mm"; $("ca-lev-f-o").textContent = F + " N";
+      $("ca-lev-r").textContent = fr(a / b, 2); $("ca-lev-fs").textContent = fr(F * a / b, 0) + " N";
+      $("ca-lev-w").textContent = fr(F * a * 1e-5, 2) + " J = " + fr(F * a / b * b * 1e-5, 2) + " J";
     });
     initCartes(root); initJeu(root.querySelector("#ca-jeu")); initQuiz(root.querySelector("#ca-quiz"));
   }

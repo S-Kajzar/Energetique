@@ -3,7 +3,7 @@
 """Images des cartes de l'accueil et des pages d'activité, tirées des figures du manuel (src/images/originaux,
 découpées par outils/extraire_figures.py) :
   - src/images/carte-*.jpg : une image par carte, 480 × 270, la figure entière centrée sur fond blanc ;
-    deux figures côte à côte pour une activité qui réunit deux exercices ;
+    deux figures côte à côte pour une activité qui réunit deux exercices (1.3) ;
   - src/images/accueil.jpg : montage d'illustration de l'accueil (quatre systèmes des activités).
 
     python3 outils/preparer_images.py"""
@@ -17,22 +17,21 @@ OUT = ROOT / "src" / "images"
 
 # carte → figure(s) du manuel
 CARTES = {
-    "carte-cours-1": ["fig-tremplin"],
-    "carte-cours-2": ["fig-disque"],
-    "carte-a1": ["fig-camion"],
-    "carte-a2": ["fig-palan-puissance"],
-    "carte-a3": ["fig-ascenseur", "fig-escalier"],
-    "carte-a4": ["fig-skieur"],
-    "carte-a5": ["fig-amortisseur"],
-    "carte-a6": ["fig-amortisseur-ressort"],
-    "carte-a7": ["fig-freinage-pente"],
-    "carte-a8": ["fig-verin"],
-    "carte-a9": ["fig-frein-sabot"],
-    "carte-a10": ["fig-frein-disque"],
-    "carte-g1": ["fig-wagonnet-levage"],
-    "carte-g2": ["fig-roues"],
-    "carte-g3": ["fig-balancier"],
-    "carte-g4": ["fig-tire-bouchon"],
+    "carte-cours": ["fig-tremplin"],
+    "carte-1-1": ["fig-camion"],
+    "carte-1-2": ["fig-palan-puissance"],
+    "carte-1-3": ["fig-ascenseur", "fig-escalier"],
+    "carte-1-4": ["fig-skieur"],
+    "carte-1-5": ["fig-wagonnet-levage"],
+    "carte-2-1": ["fig-tire-bouchon"],
+    "carte-2-2": ["fig-amortisseur"],
+    "carte-2-3": ["fig-amortisseur-ressort"],
+    "carte-2-4": ["fig-freinage-pente"],
+    "carte-2-5": ["fig-verin"],
+    "carte-2-6": ["fig-balancier"],
+    "carte-2-7": ["fig-frein-sabot"],
+    "carte-2-8": ["fig-frein-disque"],
+    "carte-2-9": ["fig-roues"],
 }
 MONTAGE = ["fig-ascenseur", "fig-roues", "fig-frein-sabot", "fig-freinage-pente"]
 
