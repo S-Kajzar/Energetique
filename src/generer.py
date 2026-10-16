@@ -833,6 +833,7 @@ def build():
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{TITRE} — cours et activités interactives</title>
+<link rel="icon" type="image/svg+xml" href="{svg_uri(figures.favicon_engrenage())}">
 <meta name="description" content="Énergétique, cours et activités interactives de deux niveaux : travail d\'une force et d\'un couple, énergies potentielle et cinétique, puissance, rendement, théorème de l\'énergie cinétique, conservation de l\'énergie, travail virtuel.">
 {style}
 {CONTENT_CSS.replace("__COURS_CSS__", COURS_CSS)}

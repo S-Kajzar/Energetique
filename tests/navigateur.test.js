@@ -64,6 +64,8 @@ test("accueil : le cours, le formulaire, les activités, les études de cas ; ca
   assert.equal(types.filter((t) => t === "image/jpeg").length, 15);
   assert.equal(types.filter((t) => t === "image/svg+").length, 2);
   assert.ok(await page.locator(".home-hero img").evaluate((i) => i.src.startsWith("data:image/jpeg") && i.naturalWidth > 0));
+  // icône de l'onglet : l'engrenage, en SVG intégré
+  assert.match(await page.locator('head link[rel="icon"]').getAttribute("href"), /^data:image\/svg\+xml;base64,/);
   for (const c of cartes) {
     assert.ok(c.img > 0, "vignette chargée");
     assert.ok(c.mots >= 3 && c.mots <= 5, JSON.stringify(c));
