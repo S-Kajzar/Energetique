@@ -195,6 +195,21 @@ def carte_etude():
     return autonome(treuil())
 
 
+def favicon_engrenage(dents=8, re_=30, ri=23, trou=9):
+    """Icône de l'onglet : un engrenage plein (bleu du gabarit) percé de son alésage, lisible en 16 × 16."""
+    pas = 2 * math.pi / dents
+    pts = []
+    for k in range(dents):
+        a = k * pas
+        # pied, flanc montant, sommet, flanc descendant : dent un peu plus étroite en tête qu'au pied
+        for da, r in ((-0.30, ri), (-0.17, re_), (0.17, re_), (0.30, ri)):
+            pts.append((32 + r * math.cos(a + da * pas), 32 + r * math.sin(a + da * pas)))
+    d = "M" + "L".join(f"{x:.2f} {y:.2f}" for x, y in pts) + "Z"
+    d += f"M{32 + trou} 32a{trou} {trou} 0 1 0 {-2 * trou} 0a{trou} {trou} 0 1 0 {2 * trou} 0Z"
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
+            f'<path fill="#1F5FA8" fill-rule="evenodd" d="{d}"/></svg>')
+
+
 # ============================================================ figures des activités
 def fig_qcm1():
     s = C((130, 140), 60, "mb") + C((130, 140), 8, "art") + L((130, 140), (190, 140), "fin")
