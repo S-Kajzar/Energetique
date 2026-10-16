@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """Génère la page « Énergétique » (index.html) : un accueil sur le modèle des dépôts « Résistance des matériaux » et
-« Chaîne fonctionnelle », deux cours interactifs (approche analytique, résolution graphique), le formulaire,
-les activités tirées des exercices du cours (une activité par exercice, les plus courts réunis par deux) et la
-rubrique « Études de cas », chacun ouvert par ?ex=…
+« Chaîne fonctionnelle », le cours interactif, le formulaire, les activités tirées des exercices du cours (une
+activité par exercice, les plus courts réunis par deux) et la rubrique « Études de cas », chacun ouvert par ?ex=…
 
     python3 src/generer.py
 
@@ -12,9 +11,6 @@ seules les entrées propres au sujet du moteur applicatif sont remplacées, chaq
 DECOR, DR_NAMES, le texte de la fenêtre « Imprimer les DR », le libellé « Diagramme validé » des questions à
 plusieurs cases et CONSEIL_MIN, lu dans window.__CONSEIL_MIN__ puisque la durée conseillée dépend de l'activité
 ouverte. Un petit script d'aiguillage, exécuté avant les moteurs, installe le contenu demandé par l'adresse.
-
-Les activités de résolution graphique utilisent l'atelier de construction (src/construction.py) : ses planches
-remplissent les cases masquées de leurs questions, que le moteur du gabarit corrige comme les autres.
 """
 import copy
 import json
@@ -22,11 +18,9 @@ import pathlib
 import re
 
 import activites
-import construction
-import cours_analytique
-import cours_graphique
+import cours_energetique
 import figures
-from commun import esc, fr, svg_uri
+from commun import esc, fr, jpg, svg_uri
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GABARIT = ROOT / "src" / "gabarit-exercice-interactif.html"
@@ -85,34 +79,6 @@ def render_qcm(b):
         </div>"""
 
 
-def render_cg(b):
-    """Construction graphique : la planche, puis le relevé de la construction (une ligne par case notée, son
-    champ masqué que remplit la planche), le bouton « Valider » et la correction commune."""
-    gid, label = b["id"], b["label"]
-    rows = "".join(
-        f'<div class="grp-l"><span class="grp-lab" id="lb-{fid}">{fl}</span><div class="sol">'
-        f'<input type="hidden" id="in-{fid}" data-q="{fid}"><span class="cg-val" data-fid="{fid}">—</span>'
-        f'<span class="mark" aria-live="polite"></span></div></div>'
-        for fid, (fl, _g, _e) in zip(b["fids"], b["fields"]))
-    sol = "".join(f"<tr><td>{fl}</td><td>{e}</td></tr>" for fl, _g, e in b["fields"])
-    n = len(b["fields"])
-    return f"""
-        <div class="fast-q grp cg-q" id="{gid}">
-          <p class="q-stem"><span class="q-num">{label}</span> <strong>{b['stem']}</strong></p>
-          <p class="q-hint">{b['hint']}</p>
-          {construction.rendu(b['cg'], b['fids'], label)}
-          <p class="cg-releve-t">Relevé de ta construction (mis à jour à chaque tracé)</p>
-          <div class="grp-fields" role="group" aria-label="Relevé de la construction {label}">{rows}</div>
-          <div class="fast-foot"><button type="button" class="btn btn-fast">Valider la construction ({n} point{'s' if n > 1 else ''})</button>
-            <span class="q-status" aria-live="polite"></span></div>
-          <p class="q-msg" role="alert"></p>
-          <div class="q-expl" hidden>
-            <table class="t grp-sol"><thead><tr><th>Relevé</th><th>Attendu</th></tr></thead><tbody>{sol}</tbody></table>
-            <div class="q-why"><p class="why-t">Construction attendue</p>{b['why']}</div>
-          </div>
-        </div>"""
-
-
 def render_qbar(b):
     chips = " ".join(f'<button type="button" class="doc-chip" data-doc="{d}" aria-pressed="false">{d}</button>'
                      for d in b["docs"])
@@ -153,8 +119,6 @@ def render_part(p):
             blocks.append(render_q(b, p))
         elif b["kind"] == "grp" and b.get("qcm"):
             blocks.append(render_qcm(b))
-        elif b["kind"] == "grp" and b.get("cg"):
-            blocks.append(render_cg(b))
         elif b["kind"] == "qbar":
             blocks.append(render_qbar(b))
         else:
@@ -194,7 +158,6 @@ def prepare_exo(e):
     e["minutes"] = sum(p["minutes"] for p in parts)
     e["n_q"] = sum(1 for p in parts for b in p["blocks"] if b["kind"] in ("q", "grp"))
     e["points"] = sum(part_points(p) for p in parts)
-    e["n_cg"] = sum(1 for p in parts for b in p["blocks"] if b.get("cg"))
     qcfg, parts_cfg = {}, []
     for p in parts:
         parts_cfg.append({"num": p["num"], "title": p["title"], "minutes": p["minutes"],
@@ -207,9 +170,8 @@ def prepare_exo(e):
                     lab = b["label"] if len(b["fields"]) == 1 else f"{b['label']} — {re.sub(r'<[^>]+>', '', fl)}"
                     qcfg[fid] = {"label": lab, "part": p["num"], "pts": 1, "grader": g}
     np_ = len(parts)
-    cg = f", dont {e['n_cg']} construction{'s' if e['n_cg'] > 1 else ''} graphique{'s' if e['n_cg'] > 1 else ''}" if e["n_cg"] else ""
     e["cfg"] = {"title": e["title"], "minutes": e["minutes"], "duree": hm(e["minutes"]),
-                "cartouche": f"{e['n_q']} questions{cg}, {e['points']} points, en {np_} partie"
+                "cartouche": f"{e['n_q']} questions, {e['points']} points, en {np_} partie"
                              f"{'s' if np_ > 1 else ''}" + (" pondérées par leur durée." if np_ > 1 else "."),
                 "parts": parts_cfg, "qcfg": qcfg, "skcfg": {}}
 
@@ -245,11 +207,11 @@ def render_exo_home(e):
              f'<div><b>{hm(e["minutes"])}</b><span>durée conseillée</span></div>' +
              (f'<div><b>{len(docs)} document{"s" if len(docs) > 1 else ""}</b><span>{docs_txt}</span></div>' if docs else
               '<div><b>Une réponse</b><span>ou plusieurs, à cocher</span></div>') +
-             f'<div><b>{e["points"]} points</b><span>{"constructions comprises" if e["n_cg"] else "un par réponse"}</span></div></div>')
+             f'<div><b>{e["points"]} points</b><span>un par réponse</span></div></div>')
     return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><span class="mc-tag">{e["tag"]}</span>{pastille(e.get("level"))}'
             f'<h1 id="home-title">{e["title"]}</h1><p class="home-sub">{e["sub"]}</p></header>{facts}</div>'
-            f'<figure class="home-hero"><img src="{svg_uri(e["hero"][0])}" alt="{esc(e["hero"][1])}" width="480" height="270">'
-            f'<figcaption class="small">{e["hero"][2]}</figcaption></figure></div>')
+            f'<figure class="home-hero"><img src="{jpg(e["image"])[0]}" alt="{esc(e["valt"])}" width="480" height="270">'
+            f'<figcaption class="small">{e["legende"]}</figcaption></figure></div>')
 
 
 MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
@@ -277,31 +239,26 @@ MODES_HTML = """<h2 class="home-choose">Choisis ton mode de travail</h2>
 
 # ============================================================ ACCUEIL
 COURS = [
-    {"key": "cours-analytique", "tag": "Cours 1", "level": "Niveau 1", "title": "Énergétique : approche analytique",
-     "mots": ["Travail", "Énergies", "Puissance", "Rendement", "Théorèmes"], "vign": figures.carte_cours_1,
-     "alt": "Skieur sur un tremplin : l'énergie potentielle devient énergie cinétique"},
-    {"key": "cours-graphique", "tag": "Cours 2", "level": "Niveau 2", "title": "Énergétique : résolution graphique",
-     "mots": ["Échelles", "Projection", "Équiprojectivité", "CIR", "Puissances virtuelles"], "vign": figures.carte_cours_2,
-     "alt": "Bielle et manivelle : vitesses construites par équiprojectivité"},
+    {"key": "cours-energetique", "tag": "Cours", "level": "", "title": "Énergétique : travail, énergies, puissance",
+     "mots": ["Travail", "Énergies", "Puissance", "Rendement", "Théorèmes"], "vign": "carte-cours",
+     "alt": "Skieur sur un tremplin : l'énergie potentielle devient énergie cinétique (figure du cours)"},
 ]
 FORMULAIRE = {"key": "formulaire-energetique", "tag": "Formulaire", "title": "Formulaire d'énergétique",
-              "mots": ["Formules", "Unités", "Méthodes graphiques"], "vign": figures.carte_formulaire,
+              "mots": ["Formules", "Unités", "Moments d'inertie"], "vign": figures.carte_formulaire,
               "alt": "Fiche de formules : travail, énergies, puissance, rendement"}
-ATELIER = {"tag": "Atelier", "title": "Atelier de construction libre", "href": "?ex=cours-graphique#atelier",
-           "mots": ["Outils de tracé", "Aimantation", "Échelles", "Sans note"], "vign": figures.carte_atelier,
-           "alt": "Planche de construction : droites, perpendiculaires et vecteurs"}
 # Rubrique « Études de cas » : tant qu'aucune étude n'est décrite, une carte l'annonce.
 ETUDE_A_VENIR = ("Étude de cas", ["Système réel", "Bilan énergétique", "Choix d'un moteur"], figures.carte_etude,
                  "Treuil de levage : moteur, réducteur, tambour")
 OUVRIR = ("Ouvrir l'activité", "Ouvrir l'étude")
-RUBRIQUES = [("analytique", "Activités : approche analytique"), ("graphique", "Activités : résolution graphique")]
 
 
 def carte(tag, title, mots, href, bouton, vign=None, alt="", cls=""):
-    """Carte de l'accueil : vignette (dessin SVG), étiquette, titre, mots-clés, bouton."""
+    """Carte de l'accueil : vignette, étiquette, titre, mots-clés, bouton. La vignette est la figure du manuel
+    (nom d'une image de src/images) ou, pour une carte sans figure d'origine, un dessin SVG (fonction)."""
     img = '<div class="cv-img cv-vide" aria-hidden="true"></div>'
     if vign:
-        img = f'<img class="cv-img" src="{svg_uri(vign())}" alt="{esc(alt)}" width="480" height="270">'
+        src = jpg(vign)[0] if isinstance(vign, str) else svg_uri(vign())
+        img = f'<img class="cv-img" src="{src}" alt="{esc(alt)}" width="480" height="270">'
     mots_html = '<ul class="cv-mots">' + "".join(f"<li>{m}</li>" for m in mots) + "</ul>"
     btn = f'<a class="btn" href="{href}">{bouton}</a>' if href else '<p class="small ex-meta etat">En cours d\'édition</p>'
     return (f'<article class="mode-card carte-v {cls}">{img}<div class="mc-head"><span class="mc-tag">{tag}</span>'
@@ -310,7 +267,7 @@ def carte(tag, title, mots, href, bouton, vign=None, alt="", cls=""):
 
 def _exo_card(e):
     return carte(e["tag"] + pastille(e.get("level")), e["title"], e["mots"], f'?ex={e["key"]}',
-                 OUVRIR[bool(e.get("etude"))], e["vign"], e["valt"])
+                 OUVRIR[bool(e.get("etude"))], e["image"], e["valt"])
 
 
 def render_hub():
@@ -318,34 +275,24 @@ def render_hub():
                           c["vign"], c["alt"], "cours-card") for c in COURS)
     form = carte(FORMULAIRE["tag"], FORMULAIRE["title"], FORMULAIRE["mots"], f'?ex={FORMULAIRE["key"]}',
                  "Ouvrir le formulaire", FORMULAIRE["vign"], FORMULAIRE["alt"])
-    rubs = ""
-    for k, titre in RUBRIQUES:
-        cards = "".join(_exo_card(e) for e in EXO_DEFS if e["rubrique"] == k and not e.get("etude"))
-        if k == "graphique":
-            cards += carte(ATELIER["tag"], ATELIER["title"], ATELIER["mots"], ATELIER["href"], "Ouvrir l'atelier",
-                           ATELIER["vign"], ATELIER["alt"])
-        rubs += f'<h2 class="home-choose">{titre}</h2><div class="ex-grid exo-grid rub-{k}">{cards}</div>'
+    cards = "".join(_exo_card(e) for e in EXO_DEFS if not e.get("etude"))
     etudes = "".join(_exo_card(e) for e in EXO_DEFS if e.get("etude")) or carte(
         "Étude 1", ETUDE_A_VENIR[0], ETUDE_A_VENIR[1], None, None, ETUDE_A_VENIR[2], ETUDE_A_VENIR[3], "en-edition")
     return (f'<div class="home-top"><div class="home-top-l"><header class="home-head"><h1 id="home-title">{TITRE}</h1>'
             "<p class=\"home-sub\">Travail, énergies potentielle et cinétique, puissance, rendement : faire le bilan "
-            "énergétique d'un mécanisme, puis en tirer un effort, une vitesse ou une puissance. Deux approches : le "
-            "calcul (approche analytique) et la construction à l'échelle (résolution graphique, avec un atelier de "
-            "tracé). Des cours, un formulaire et des activités de deux niveaux, à faire en mode entraînement ou en mode "
-            "examen.</p></header></div>"
-            f'<figure class="home-hero"><img src="{svg_uri(figures.hero_accueil())}" alt="Un skieur s\'élance d\'un '
-            f'tremplin : à la hauteur h de départ correspond la vitesse v au bas de la piste" width="480" height="270">'
-            '<figcaption class="small">La loi de conservation de l\'énergie relie la hauteur de départ et la vitesse '
-            "d'envol.</figcaption></figure></div>"
-            f'<h2 class="home-choose">Les cours</h2><div class="ex-grid cours-grid">{cours}</div>'
+            "énergétique d'un mécanisme, puis en tirer un effort, une vitesse ou une puissance. Le cours, le formulaire "
+            "et des activités de deux niveaux, à faire en mode entraînement ou en mode examen.</p></header></div>"
+            f'<figure class="home-hero"><img src="{jpg("accueil")[0]}" alt="Quatre systèmes des activités : cabine '
+            f'd\'ascenseur, roues dentées, frein à sabot, automobile freinant dans une pente" width="720" height="405">'
+            '<figcaption class="small">Quelques systèmes étudiés dans les activités.</figcaption></figure></div>'
+            f'<h2 class="home-choose">Le cours</h2><div class="ex-grid cours-grid">{cours}</div>'
             f'<h2 class="home-choose">Le formulaire</h2><div class="ex-grid form-grid">{form}</div>'
-            f'{rubs}'
+            f'<h2 class="home-choose">Les activités</h2><div class="ex-grid exo-grid">{cards}</div>'
             f'<h2 class="home-choose">Études de cas</h2><div class="ex-grid etude-grid">{etudes}</div>'
             f'<p class="home-note small">Pastilles : {pastille("Niveau 1").strip()} premier niveau, '
             f'{pastille("Niveau 2").strip()} niveau approfondi. Chaque activité propose le mode entraînement '
-            "(correction question par question) ou le mode examen (correction à la remise de la copie). Les activités "
-            "de résolution graphique se font sur des planches à l'échelle, avec les outils de l'atelier de "
-            "construction. Rien n'est enregistré sur l'ordinateur.</p>")
+            "(correction question par question) ou le mode examen (correction à la remise de la copie). "
+            "Rien n'est enregistré sur l'ordinateur.</p>")
 
 
 # ============================================================ COURS — éléments communs (repris du dépôt « Chaîne fonctionnelle »)
@@ -505,7 +452,7 @@ COURS_COMMUN_CSS = """
 .cours-nav a{font:600 .92rem var(--f-titre); color:var(--encre); background:var(--papier); border:1.5px solid var(--encre); padding:5px 12px; text-decoration:none}
 .cours-nav a:hover{background:var(--jaune-pale)}
 .cours .part-body h3{font:700 1.12rem var(--f-titre); margin:18px 0 6px}
-.formule{display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; border:2px solid var(--rouge); background:#fff; padding:10px 18px; margin:12px 0; max-width:720px}
+.formule{display:flex; flex-wrap:wrap; gap:14px 28px; align-items:center; border:2px solid var(--rouge); background:#fff; padding:10px 18px; margin:12px 0; width:fit-content; max-width:100%}
 .formule .f-main{font:700 1.35rem var(--f-titre); line-height:2}
 .formule .f-units{font-size:.9rem; color:var(--encre-2)}
 .simu{border:2px solid var(--bleu); background:var(--bleu-pale); padding:12px 16px; margin:14px 0}
@@ -531,7 +478,7 @@ COURS_COMMUN_CSS = """
 .simu-svg{display:block; width:100%; height:auto; max-width:760px; background:#fff; border:1px solid var(--trait-fin); margin:8px 0; font-family:var(--f-texte)}
 .exemple{background:#F6F7F4; border:1px solid var(--trait-fin); padding:6px 16px; margin-top:12px}
 .exemple h3{font:700 1.05rem var(--f-titre); margin:10px 0 4px}
-.remarque{border-left:6px solid var(--jaune); background:var(--jaune-pale); padding:8px 14px; margin:12px 0; max-width:80ch}
+.remarque{border-left:6px solid var(--jaune); background:var(--jaune-pale); padding:8px 14px; margin:12px 0}
 .remarque p{margin:.2rem 0}
 .quiz{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px}
 .quiz-q{border:1.5px solid var(--encre); background:#fff; padding:8px 14px 10px; margin:0}
@@ -575,13 +522,11 @@ COURS_COMMUN_CSS = """
 }
 """
 
-COURS_RENDER = {"cours-analytique": lambda: cours_analytique.render(AIDES),
-                "cours-graphique": lambda: cours_graphique.render(AIDES),
+COURS_RENDER = {"cours-energetique": lambda: cours_energetique.render(AIDES),
                 "formulaire-energetique": lambda: activites.page_formulaire(AIDES)}
-COURS_JS = (COURS_COMMUN_JS + cours_analytique.JS + cours_graphique.JS +
-            '\n  var INIT = { "cours-analytique": initCoursAnalytique, "cours-graphique": initCoursGraphique, '
-            '"formulaire-energetique": function () {} };\n')
-COURS_CSS = COURS_COMMUN_CSS + cours_analytique.CSS + cours_graphique.CSS
+COURS_JS = (COURS_COMMUN_JS + cours_energetique.JS +
+            '\n  var INIT = { "cours-energetique": initCoursEnergetique, "formulaire-energetique": function () {} };\n')
+COURS_CSS = COURS_COMMUN_CSS + cours_energetique.CSS
 
 
 # ============================================================ AIGUILLAGE
@@ -664,23 +609,26 @@ CONTENT_CSS = """<style>
 .fs .cote{stroke:#5A6670; stroke-width:.9; fill:#5A6670}
 .fs .pointille{fill:none; stroke:#5A6670; stroke-width:1; stroke-dasharray:4 3}
 
+/* ---------- le texte occupe toute la largeur blanche des sections, dans les cours comme dans les activités
+   (le gabarit le limite à 72-80 caractères, ce qui laisse un blanc à droite) ---------- */
+.part-body>p,.part-body>ul,.part-body>ol,.data,.q-stem,.q-hint,.q-expl,.selfeval,.recap-head p,.recap .final-detail,
+.es-lead,.home-sub,.consignes p,.remarque{max-width:none}
+
 /* ---------- questions à plusieurs cases (mécanisme « fast-q » du gabarit) ---------- */
 .grp{margin:14px 0 6px; padding:10px 0 12px 14px; border-left:3px solid var(--trait-fin)}
-.grp-fields{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px; max-width:820px}
+.grp-fields{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px}
 .grp-l{display:grid; grid-template-columns:minmax(150px,.9fr) minmax(0,1.3fr); gap:4px 14px; align-items:center; padding:2px 0; border-bottom:1px dashed var(--trait-fin)}
 .grp-lab{font-size:.95rem}
 .grp .sol{display:flex; align-items:center; gap:8px}
 .grp .sol .mark{flex:0 0 4.6em; font-size:.82rem; font-weight:700}
 .grp .sol.is-ok .mark{color:var(--vert)} .grp .sol.is-ko .mark{color:var(--rouge)}
-.grp .sol.is-ok .cg-val{color:var(--vert)} .grp .sol.is-ko .cg-val{color:var(--rouge)}
 .grp .fast-foot .q-status{font-weight:700}
-.grp-sol{max-width:780px; margin:4px 0 8px}
+.grp-sol{margin:4px 0 8px}
 .grp-sol td:last-child{font-weight:600}
 .q-why .why-t{font:700 .95rem var(--f-titre); margin:.6rem 0 .2rem}
-.cg-releve-t{margin:10px 0 0; font:700 .85rem var(--f-titre); text-transform:uppercase; letter-spacing:.04em; color:var(--encre-2)}
 @media (max-width:620px){ .grp-l{grid-template-columns:minmax(0,1fr)} }
 /* ---------- QCM (questions à propositions) ---------- */
-.qcm-opts{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px; max-width:820px}
+.qcm-opts{display:flex; flex-direction:column; gap:6px; margin:8px 0 4px}
 .qcm-o{display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:#fff; border:1.5px solid var(--trait); border-radius:3px; padding:8px 12px; font:inherit; font-size:.97rem; color:var(--encre); cursor:pointer}
 .qcm-o:hover:not(:disabled){border-color:var(--encre); background:var(--jaune-pale)}
 .qcm-o:focus-visible{outline:3px solid var(--jaune); outline-offset:1px}
@@ -828,7 +776,7 @@ QCM_JS = r"""<script>/* QCM : un clic coche ou décoche une proposition ; les re
 
 # ============================================================ ASSEMBLAGE
 DECOR_JS = """  var DECOR = {
-    // aucun tracé à main levée : les constructions se font dans l'atelier (src/construction.py)
+    // aucun tracé dans les activités actuelles : une entrée par fond de tracé (voir le dépôt RDM)
   };
 """
 DR_NAMES_JS = """  var DR_NAMES = {
@@ -885,9 +833,9 @@ def build():
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{TITRE} — cours et activités interactives</title>
-<meta name="description" content="Énergétique, cours et activités interactives de deux niveaux : travail d'une force et d'un couple, énergies potentielle et cinétique, puissance, rendement, théorème de l'énergie cinétique, conservation de l'énergie ; résolution graphique avec un atelier de construction.">
+<meta name="description" content="Énergétique, cours et activités interactives de deux niveaux : travail d\'une force et d\'un couple, énergies potentielle et cinétique, puissance, rendement, théorème de l\'énergie cinétique, conservation de l\'énergie, travail virtuel.">
 {style}
-{CONTENT_CSS.replace("__COURS_CSS__", COURS_CSS + construction.CG_CSS)}
+{CONTENT_CSS.replace("__COURS_CSS__", COURS_CSS)}
 </head>
 <body class="no-mode">
 
@@ -932,7 +880,7 @@ def build():
     <header class="recap-head"><h2 id="t-recap">Récapitulatif et note finale</h2>
       <p class="small">Les questions non validées comptent comme fausses. Chaque partie est ramenée sur 20, puis pondérée par sa durée conseillée.</p></header>
     <div id="exam-submit-wrap">
-      <p class="es-lead">Ta copie n'est pas encore corrigée : aucune réponse n'est verrouillée, tu peux encore revenir sur les questions et les constructions.</p>
+      <p class="es-lead">Ta copie n'est pas encore corrigée : aucune réponse n'est verrouillée, tu peux encore revenir sur les questions.</p>
       <button type="button" class="btn btn-exam" id="exam-submit">J'ai fini, je fais corriger ma copie</button>
       <p class="es-warn" id="exam-warn" role="alert"></p>
     </div>
@@ -947,7 +895,7 @@ def build():
       <p class="final-detail small"></p>
     </div>
     <div class="recap-foot" id="recap-foot"><button type="button" class="btn btn-print">Imprimer ma copie</button>
-      <span class="small no-print">L'impression reprend tes réponses, tes constructions, les corrections et ce récapitulatif.</span>
+      <span class="small no-print">L'impression reprend tes réponses, les corrections et ce récapitulatif.</span>
       <a class="btn ghost no-print" href="?">{HOUSE} Retour à l'accueil</a></div>
   </section>
 </main>
@@ -968,7 +916,6 @@ def build():
 {grading}
 {app}
 {QCM_JS}
-{construction.CG_JS}
 </body>
 </html>
 """

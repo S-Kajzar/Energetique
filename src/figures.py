@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Figures redessinées en SVG (les pages fournies sont des photographies du manuel, peu lisibles) : illustration de
-l'accueil, vignettes des cartes et figures des énoncés. Toutes sur un canevas de 480 × 270 (format des cartes) ;
+"""Figures redessinées en SVG (les pages fournies sont des photographies du manuel, peu lisibles) : figures des
+énoncés, et vignettes des deux cartes de l'accueil qui n'ont pas de figure d'origine (formulaire, étude à venir). Toutes sur un canevas de 480 × 270 (format des cartes) ;
 la même figure sert de vignette (SVG autonome, style intégré) et de figure d'énoncé (SVG dans la page)."""
 import math
 
@@ -172,52 +172,6 @@ def tremplin(lab=True):
     return s
 
 
-def hero_accueil():
-    return autonome(tremplin())
-
-
-def carte_cours_1():
-    s = tremplin(lab=False)
-    for i, (h1, h2, lab) in enumerate([(70, 0, "Ep"), (35, 35, ""), (0, 70, "Ec")]):
-        x = 26 + i * 34
-        s += R(x, 110 - h1, 12, h1, "mb") if h1 else ""
-        s += R(x + 13, 110 - h2, 12, h2, "mo") if h2 else ""
-    s += L((20, 110), (125, 110)) + T((26, 128), "Ep", "tb") + T((92, 128), "Ec", "tr")
-    return autonome(s)
-
-
-def bielle_manivelle(o=(110, 170), r=55, ang=55, Lb=200, vec=True):
-    """Bielle-manivelle : manivelle OA de rayon r à ang degrés, bielle AB de longueur Lb, piston B sur l'axe."""
-    a = math.radians(ang)
-    A = (o[0] + r * math.cos(a), o[1] - r * math.sin(a))
-    bx = A[0] + math.sqrt(Lb ** 2 - (o[1] - A[1]) ** 2)
-    B = (bx, o[1])
-    s = L((o[0] - 30, o[1]), (B[0] + 80, o[1]), "axe") + C(o, r, "pointille")
-    s += R(B[0] - 26, o[1] - 18, 52, 36, "mb", 3) + L(o, A) + L(A, B)
-    s += pivot(o) + C(A, 5, "art") + C(B, 5, "art")
-    s += T((o[0] - 22, o[1] - 10), "O", "tn") + T((A[0] - 18, A[1] - 6), "A", "tn") + T((B[0] - 4, o[1] - 24), "B", "tn")
-    if vec:
-        # vitesse de A perpendiculaire à OA, vitesse de B horizontale (équiprojectivité le long de AB)
-        k = 1.25
-        tA = (A[0] + math.sin(a) * 60 * k, A[1] - math.cos(a) * 60 * k)
-        s += F(A, tA, "vb", 10)
-        d = ((B[0] - A[0]) / Lb, (B[1] - A[1]) / Lb)
-        proj = (tA[0] - A[0]) * d[0] + (tA[1] - A[1]) * d[1]
-        vb = proj / d[0]
-        s += F(B, (B[0] + vb, B[1]), "vr", 10)
-        pa = (A[0] + d[0] * proj, A[1] + d[1] * proj)
-        pb = (B[0] + d[0] * proj, B[1] + d[1] * proj)
-        s += L(tA, pa, "pointille") + L((B[0] + vb, B[1]), pb, "pointille") + L(A, pa, "vv") + L(B, pb, "vv")
-        s += V((tA[0] + 6, tA[1] + 2), "V", "A", "tb") + V((B[0] + vb - 4, B[1] - 12), "V", "B", "tr", "end")
-    return s, A, B
-
-
-def carte_cours_2():
-    s, _a, _b = bielle_manivelle()
-    s += T((24, 40), "même projection sur (AB)", "tc") + L((24, 46), (60, 46), "vv")
-    return autonome(s)
-
-
 def carte_formulaire():
     s = R(110, 20, 260, 234, "mf", 4) + R(110, 20, 260, 34, "mb", 4)
     s += T((240, 43), "Formulaire d'énergétique", "tn", "middle")
@@ -225,21 +179,6 @@ def carte_formulaire():
               "P = F · V · cos θ = C · ω", "η = W restituée / W fournie"]
     for i, t in enumerate(lignes):
         s += T((130, 78 + i * 25), t, "", "start", 14)
-    return autonome(s)
-
-
-def carte_atelier():
-    s = ""
-    for x in range(20, 480, 20):
-        s += L((x, 0), (x, 270), "fin").replace('class="fin"', 'class="fin" opacity=".25"')
-    for y in range(10, 270, 20):
-        s += L((0, y), (480, y), "fin").replace('class="fin"', 'class="fin" opacity=".25"')
-    s += L((60, 220), (400, 50), "axe") + L((150, 40), (330, 250), "axe")
-    s += L((90, 200), (300, 200)) + C((300, 200), 70, "pointille") + F((90, 200), (210, 120), "vb", 12)
-    s += C((258, 132), 9, "mo") + T((270, 125), "aimantation", "tc")
-    s += T((214, 112), "V", "tn tb") + R(20, 20, 210, 30, "mf", 3)
-    for i, t in enumerate(["Point", "Droite", "⊥", "∥", "Vecteur"]):
-        s += T((30 + i * 40, 40), t, "tc")
     return autonome(s)
 
 
